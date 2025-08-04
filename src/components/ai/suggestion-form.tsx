@@ -14,8 +14,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Loader2 } from 'lucide-react';
-import { useEffect } from 'react';
+import { Sparkles, Loader2, Download } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import {
@@ -24,6 +24,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 const initialState = {
   message: '',
@@ -48,6 +51,8 @@ function SubmitButton() {
 const SuggestionForm = () => {
   const [state, formAction] = useFormState(generateMealSuggestion, initialState);
   const { toast } = useToast();
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const { pending } = useFormStatus();
 
   useEffect(() => {
     if (state.message && state.message !== 'success') {
@@ -58,6 +63,70 @@ const SuggestionForm = () => {
         })
     }
   }, [state, toast])
+  
+  const handleDownloadPdf = () => {
+    const input = suggestionsRef.current;
+    if (!input) {
+        toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Could not find the content to download.",
+        });
+        return;
+    }
+
+    toast({
+        title: "Generating PDF...",
+        description: "Your meal plan will be downloaded shortly.",
+    });
+
+    // We need to temporarily open all accordion items to capture all content
+    const accordionItems = input.querySelectorAll('[data-state="closed"]');
+    accordionItems.forEach(item => {
+        const trigger = item.querySelector('[aria-expanded="false"]');
+        (trigger as HTMLElement)?.click();
+    });
+    
+    setTimeout(() => {
+        html2canvas(input, {
+            scale: 2, // Higher scale for better quality
+            useCORS: true, 
+            backgroundColor: null, // Use element's background
+        }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const ratio = canvasWidth / canvasHeight;
+            const width = pdfWidth;
+            const height = width / ratio;
+
+            let position = 0;
+            let pageHeight = height > pdfHeight ? pdfHeight : height;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, width, height);
+            let heightLeft = height - pageHeight;
+
+            while (heightLeft >= 0) {
+                position = heightLeft - height;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, width, height);
+                pageHeight = heightLeft > pdfHeight ? pdfHeight : heightLeft;
+                heightLeft -= pageHeight;
+            }
+            pdf.save(`${state.data?.planTitle?.replace(/\s+/g, '-') || 'meal-plan'}.pdf`);
+
+            // Close the accordions again
+            const openAccordionItems = input.querySelectorAll('[data-state="open"]');
+            openAccordionItems.forEach(item => {
+                const trigger = item.querySelector('[aria-expanded="true"]');
+                (trigger as HTMLElement)?.click();
+            });
+        });
+    }, 500); // Wait for accordions to open
+  };
 
 
   return (
@@ -140,18 +209,26 @@ const SuggestionForm = () => {
       </Card>
       
       <Card className="flex flex-col lg:col-span-2">
-        <CardHeader>
-          <CardTitle>
-            {state.data?.planTitle || 'Your Meal Suggestions'}
-            </CardTitle>
-          <CardDescription>
-            Here are some ideas to get you started. Click on a meal to see the recipe.
-          </CardDescription>
+        <CardHeader className='flex-row items-center justify-between'>
+            <div>
+              <CardTitle>
+                {state.data?.planTitle || 'Your Meal Suggestions'}
+              </CardTitle>
+              <CardDescription>
+                Here are some ideas to get you started. Click on a meal to see the recipe.
+              </CardDescription>
+            </div>
+            {state.data && (
+                <Button onClick={handleDownloadPdf} variant="outline" size="sm" disabled={pending}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download PDF
+                </Button>
+            )}
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col p-4">
+        <CardContent ref={suggestionsRef} className="flex-1 flex flex-col p-4">
             {state.data && state.data.mealSuggestions && state.data.mealSuggestions.length > 0 ? (
                  <div className="w-full space-y-4 overflow-y-auto">
-                    <Accordion type="single" collapsible className="w-full">
+                    <Accordion type="multiple" className="w-full">
                         {state.data.mealSuggestions.map((meal, index) => (
                             <AccordionItem value={`item-${index}`} key={index}>
                                 <AccordionTrigger>
