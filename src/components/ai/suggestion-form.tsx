@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Sparkles, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 
 const initialState = {
   message: '',
@@ -27,7 +28,7 @@ const initialState = {
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending}>
+    <Button type="submit" disabled={pending} className="w-full md:w-auto">
       {pending ? (
         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       ) : (
@@ -54,8 +55,8 @@ const SuggestionForm = () => {
 
 
   return (
-    <div className="grid gap-8 md:grid-cols-2">
-      <Card>
+    <div className="grid gap-8 lg:grid-cols-3">
+      <Card className="lg:col-span-1">
         <form action={formAction}>
           <CardHeader>
             <CardTitle>Personalize Your Meals</CardTitle>
@@ -65,6 +66,16 @@ const SuggestionForm = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="nationality">Nationality</Label>
+              <Input
+                id="nationality"
+                name="nationality"
+                placeholder="e.g., Italian, Mexican, Japanese"
+                defaultValue="American"
+              />
+              {state.errors?.nationality && <p className="text-sm font-medium text-destructive">{state.errors.nationality}</p>}
+            </div>
             <div className="space-y-2">
               <Label htmlFor="dietaryRestrictions">Dietary Restrictions</Label>
               <Textarea
@@ -97,6 +108,24 @@ const SuggestionForm = () => {
                     {state.errors?.macroRatio && <p className="text-sm font-medium text-destructive">{state.errors.macroRatio}</p>}
                 </div>
             </div>
+             <div className="space-y-2">
+                <Label>Plan Duration</Label>
+                <RadioGroup name="planDuration" defaultValue="Daily" className="flex flex-col space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Daily" id="daily" />
+                    <Label htmlFor="daily">Daily</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Weekly" id="weekly" />
+                    <Label htmlFor="weekly">Weekly</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="Monthly" id="monthly" />
+                    <Label htmlFor="monthly">Monthly</Label>
+                  </div>
+                </RadioGroup>
+                 {state.errors?.planDuration && <p className="text-sm font-medium text-destructive">{state.errors.planDuration}</p>}
+            </div>
           </CardContent>
           <CardFooter>
             <SubmitButton />
@@ -104,25 +133,30 @@ const SuggestionForm = () => {
         </form>
       </Card>
       
-      <Card className="flex flex-col">
+      <Card className="flex flex-col lg:col-span-2">
         <CardHeader>
-          <CardTitle>Your Meal Suggestions</CardTitle>
+          <CardTitle>
+            {state.data?.planTitle || 'Your Meal Suggestions'}
+            </CardTitle>
           <CardDescription>
             Here are some ideas to get you started.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col items-center justify-center p-4">
+        <CardContent className="flex-1 flex flex-col p-4">
             {state.data && state.data.mealSuggestions && state.data.mealSuggestions.length > 0 ? (
-                 <div className="w-full space-y-4">
+                 <div className="w-full space-y-4 overflow-y-auto">
                     {state.data.mealSuggestions.map((meal, index) => (
                         <div key={index} className="rounded-lg border p-4">
-                            <h4 className="font-bold">{meal.mealName} (~{meal.calories} kcal)</h4>
+                            <h4 className="font-bold">
+                                {meal.day && <span className="text-primary mr-2">{meal.day}:</span>}
+                                {meal.mealName} (~{meal.calories} kcal)
+                            </h4>
                             <p className="text-sm text-muted-foreground">{meal.description}</p>
                         </div>
                     ))}
                  </div>
             ) : (
-                <div className="text-center text-muted-foreground p-8">
+                <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground p-8">
                     <Sparkles className="mx-auto h-12 w-12" />
                     <p className="mt-4">Your AI-powered meal plan will appear here.</p>
                 </div>

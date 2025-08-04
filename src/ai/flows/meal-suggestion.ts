@@ -12,6 +12,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const MealSuggestionInputSchema = z.object({
+  nationality: z.string().describe('The nationality of the user to suggest culturally relevant meals.'),
   dietaryRestrictions: z
     .string()
     .describe(
@@ -28,13 +29,16 @@ const MealSuggestionInputSchema = z.object({
     .describe(
       'The users macro nutrient ratio goal as a percentage of Protein, Carbs, and Fat (e.g., 30% Protein, 40% Carbs, 30% Fat).'
     ),
+  planDuration: z.enum(['Daily', 'Weekly', 'Monthly']).describe('The duration for the meal plan.'),
 });
 export type MealSuggestionInput = z.infer<typeof MealSuggestionInputSchema>;
 
 const MealSuggestionOutputSchema = z.object({
+  planTitle: z.string().describe("A title for the generated meal plan, e.g., 'Your Weekly Meal Plan'."),
   mealSuggestions: z
     .array(
       z.object({
+        day: z.string().optional().describe("The day for the suggestion (e.g., 'Monday', 'Day 1'). Only for Weekly/Monthly plans."),
         mealName: z.string().describe('The name of the suggested meal.'),
         description: z.string().describe('A brief description of the meal.'),
         calories: z.number().describe('Estimated calories for the meal.'),
@@ -54,14 +58,22 @@ const prompt = ai.definePrompt({
   name: 'mealSuggestionPrompt',
   input: {schema: MealSuggestionInputSchema},
   output: {schema: MealSuggestionOutputSchema},
-  prompt: `You are a nutritional expert. Generate a list of 3 meal suggestions based on the user's dietary restrictions, preferences, calorie goal and macro ratio.
+  prompt: `You are a nutritional expert and master chef. Generate a list of meal suggestions based on the user's details.
 
+Plan Duration: {{{planDuration}}}
+Nationality for meal inspiration: {{{nationality}}}
 Dietary Restrictions: {{{dietaryRestrictions}}}
 Preferences: {{{preferences}}}
 Daily Calorie Goal for all meals: {{{calorieGoal}}}
 Target Macro Ratio (Protein/Carbs/Fat): {{{macroRatio}}}
 
-Provide 3 diverse suggestions for breakfast, lunch, or dinner. For each suggestion, provide the meal name, a short description, and an estimated calorie count.
+- Generate a meal plan for the specified duration.
+- For 'Daily' plans, provide 3 diverse suggestions for breakfast, lunch, or dinner.
+- For 'Weekly' plans, provide 3 meals (breakfast, lunch, dinner) for each of the 7 days.
+- For 'Monthly' plans, provide a sample 7-day plan that can be repeated or varied.
+- Ensure suggestions are culturally relevant to the specified nationality.
+- For each suggestion, provide the meal name, a short description, and an estimated calorie count.
+- For weekly/monthly plans, include the 'day' for each suggestion.
 `,
 });
 

@@ -4,10 +4,14 @@ import { suggestMeal, type MealSuggestionInput, type MealSuggestionOutput } from
 import { z } from 'zod';
 
 const MealSuggestionInputSchema = z.object({
+  nationality: z.string().min(1, { message: 'Nationality cannot be empty.' }),
   dietaryRestrictions: z.string().min(1, { message: 'Dietary restrictions cannot be empty.' }),
   preferences: z.string().min(1, { message: 'Preferences cannot be empty.' }),
   calorieGoal: z.coerce.number().positive({ message: 'Calorie goal must be a positive number.' }),
   macroRatio: z.string().min(1, { message: 'Macro ratio cannot be empty.' }),
+  planDuration: z.enum(['Daily', 'Weekly', 'Monthly'], {
+    errorMap: () => ({ message: 'Please select a plan duration.' })
+  })
 });
 
 export async function generateMealSuggestion(
@@ -19,10 +23,12 @@ export async function generateMealSuggestion(
     data: MealSuggestionOutput | null;
 }> {
   const validatedFields = MealSuggestionInputSchema.safeParse({
+    nationality: formData.get('nationality'),
     dietaryRestrictions: formData.get('dietaryRestrictions'),
     preferences: formData.get('preferences'),
     calorieGoal: formData.get('calorieGoal'),
     macroRatio: formData.get('macroRatio'),
+    planDuration: formData.get('planDuration'),
   });
 
   if (!validatedFields.success) {
