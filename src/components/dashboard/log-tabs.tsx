@@ -27,12 +27,20 @@ import { Button } from '@/components/ui/button';
 import { PlusCircle, Search } from 'lucide-react';
 import { Input } from '../ui/input';
 import AddFoodDialog from './add-food-dialog';
+import AddExerciseDialog from './add-exercise-dialog';
 
 export interface FoodLogEntry {
   id: number;
   meal: string;
   item: string;
   calories: number;
+}
+
+export interface ExerciseLogEntry {
+    id: number;
+    type: string;
+    details: string;
+    caloriesBurned: number;
 }
 
 const initialFoodLog: FoodLogEntry[] = [
@@ -42,17 +50,23 @@ const initialFoodLog: FoodLogEntry[] = [
   { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', calories: 230 },
 ];
 
-const exerciseLog = [
-  { exercise: 'Cardio', details: 'Running - 30 min', caloriesBurned: 300 },
-  { exercise: 'Strength', details: 'Weightlifting', caloriesBurned: 150 },
+const initialExerciseLog: ExerciseLogEntry[] = [
+  { id: 1, type: 'Cardio', details: 'Running - 30 min', caloriesBurned: 300 },
+  { id: 2, type: 'Strength', details: 'Weightlifting', caloriesBurned: 150 },
 ];
 
 const LogTabs = () => {
     const [foodLog, setFoodLog] = useState<FoodLogEntry[]>(initialFoodLog);
+    const [exerciseLog, setExerciseLog] = useState<ExerciseLogEntry[]>(initialExerciseLog);
     const [isAddFoodOpen, setAddFoodOpen] = useState(false);
+    const [isAddExerciseOpen, setAddExerciseOpen] = useState(false);
 
     const handleAddFood = (newFood: Omit<FoodLogEntry, 'id'>) => {
         setFoodLog(prevLog => [...prevLog, { ...newFood, id: prevLog.length + 1 }]);
+    }
+
+    const handleAddExercise = (newExercise: Omit<ExerciseLogEntry, 'id'>) => {
+        setExerciseLog(prevLog => [...prevLog, { ...newExercise, id: prevLog.length + 1 }]);
     }
 
   return (
@@ -123,9 +137,9 @@ const LogTabs = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {exerciseLog.map((entry, index) => (
-                  <TableRow key={index}>
-                    <TableCell className="font-medium">{entry.exercise}</TableCell>
+                {exerciseLog.map((entry) => (
+                  <TableRow key={entry.id}>
+                    <TableCell className="font-medium">{entry.type}</TableCell>
                     <TableCell>{entry.details}</TableCell>
                     <TableCell className="text-right">{entry.caloriesBurned}</TableCell>
                   </TableRow>
@@ -134,7 +148,7 @@ const LogTabs = () => {
             </Table>
           </CardContent>
            <CardFooter className="justify-end">
-             <Button>
+             <Button onClick={() => setAddExerciseOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" /> Add Exercise
             </Button>
           </CardFooter>
@@ -142,6 +156,7 @@ const LogTabs = () => {
       </TabsContent>
     </Tabs>
     <AddFoodDialog isOpen={isAddFoodOpen} onOpenChange={setAddFoodOpen} onAddFood={handleAddFood} />
+    <AddExerciseDialog isOpen={isAddExerciseOpen} onOpenChange={setAddExerciseOpen} onAddExercise={handleAddExercise} />
     </>
   );
 };
