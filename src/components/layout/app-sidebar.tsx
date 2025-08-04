@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -16,10 +17,17 @@ import {
   User,
   Utensils,
   Settings,
+  Languages,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '../ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 
 const AppSidebar = () => {
   const pathname = usePathname();
@@ -59,7 +67,23 @@ const AppSidebar = () => {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="p-4">
+      <SidebarFooter className="p-4 flex flex-col gap-2">
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="justify-start gap-2">
+                    <Languages className="w-5 h-5" />
+                    <span>Language</span>
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="right" align="start">
+                <DropdownMenuItem>
+                    English
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                    Arabic
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
         <Button variant="ghost" className="justify-start gap-2">
           <Settings className="w-5 h-5" />
           <span>Settings</span>
