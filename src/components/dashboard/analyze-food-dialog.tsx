@@ -14,9 +14,9 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Camera, ScanBarcode, RefreshCw, Type } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { lookupBarcode } from '@/ai/flows/barcode-lookup';
-import { analyzeFood } from '@/ai/flows/analyze-food-flow';
-import { analyzeTextFood } from '@/ai/flows/analyze-text-food-flow';
+import { lookupBarcode, type BarcodeLookupOutput } from '@/ai/flows/barcode-lookup';
+import { analyzeFood, type FoodAnalysisOutput } from '@/ai/flows/analyze-food-flow';
+import { analyzeTextFood, type FoodAnalysisTextOutput } from '@/ai/flows/analyze-text-food-flow';
 import {
   Tabs,
   TabsContent,
@@ -26,10 +26,12 @@ import {
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 
+type AnalysisResult = (FoodAnalysisOutput | FoodAnalysisTextOutput | BarcodeLookupOutput) & { dishName?: string, productName?: string };
+
 interface AnalyzeFoodDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onAnalysisComplete: (result: { dishName: string; calories: number; portionSize: string; protein: number; carbs: number; fat: number; }) => void;
+  onAnalysisComplete: (result: AnalysisResult) => void;
 }
 
 const isBarcodeDetectorSupported = () => {
@@ -111,14 +113,7 @@ export default function AnalyzeFoodDialog({
               description: `Could not find a product with barcode: ${barcodeValue}`,
             });
         } else {
-            onAnalysisComplete({
-                dishName: result.productName,
-                calories: result.calories ?? 0,
-                protein: result.protein ?? 0,
-                carbs: result.carbs ?? 0,
-                fat: result.fat ?? 0,
-                portionSize: "1 serving" // Default portion size for barcodes
-            });
+            onAnalysisComplete(result);
         }
     } catch (error) {
         console.error('Barcode lookup failed:', error);

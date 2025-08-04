@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -23,7 +24,7 @@ const getProductInfoFromBarcode = ai.defineTool(
   },
   async ({ barcode }) => {
     try {
-      const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_en,nutriments,status,status_verbose`);
+      const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_en,nutriments,status,status_verbose,serving_size`);
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
       }
@@ -51,6 +52,9 @@ const BarcodeLookupOutputSchema = z.object({
   protein: z.number().optional().describe('The grams of protein per serving.'),
   carbs: z.number().optional().describe('The grams of carbohydrates per serving.'),
   fat: z.number().optional().describe('The grams of fat per serving.'),
+  sodium: z.number().optional().describe('The milligrams of sodium per serving.'),
+  sugar: z.number().optional().describe('The grams of sugar per serving.'),
+  portionSize: z.string().optional().describe('The serving size of the product.'),
   notFound: z.boolean().optional().describe('Set to true if the product is not found.'),
 });
 export type BarcodeLookupOutput = z.infer<typeof BarcodeLookupOutputSchema>;
@@ -66,13 +70,20 @@ A user has provided a barcode: {{{barcode}}}.
 
 Your task is to use the getProductInfoFromBarcode tool to find the product information for this barcode.
 
-From the tool's output, extract the product name ('product_name' or 'product_name_en') and the nutritional information for a standard serving size (usually 100g).
-- Calories: 'nutriments.energy-kcal_100g' or 'nutriments.energy-kcal_serving'
-- Protein: 'nutriments.proteins_100g' or 'nutriments.proteins_serving'
-- Carbohydrates: 'nutriments.carbohydrates_100g' or 'nutriments.carbohydrates_serving'
-- Fat: 'nutriments.fat_100g' or 'nutriments.fat_serving'
+From the tool's output, extract the product name ('product_name' or 'product_name_en') and the nutritional information.
+The nutritional values are often per 100g, but you should return them for the 'serving_size' if it exists.
 
-- If the product is found and has the required information, return the 'productName', 'calories', 'protein', 'carbs', and 'fat'.
+- Product Name: 'product_name' or 'product_name_en'
+- Portion Size: 'serving_size' (if not available, use '100g')
+- Calories: 'nutriments.energy-kcal_serving' or 'nutriments.energy-kcal_100g'
+- Protein: 'nutriments.proteins_serving' or 'nutriments.proteins_100g'
+- Carbohydrates: 'nutriments.carbohydrates_serving' or 'nutriments.carbohydrates_100g'
+- Fat: 'nutriments.fat_serving' or 'nutriments.fat_100g'
+- Sodium: 'nutriments.sodium_serving' or 'nutriments.sodium_100g' (convert from g to mg if needed)
+- Sugar: 'nutriments.sugars_serving' or 'nutriments.sugars_100g'
+
+
+- If the product is found and has the required information, return all fields.
 - If the product is found but some nutritional information is missing, return what is available and use 0 for the missing values.
 - If the 'status' from the API is 0 or the product is not found, return 'notFound: true'.`
 });

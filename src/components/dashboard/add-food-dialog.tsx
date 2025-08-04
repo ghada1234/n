@@ -40,7 +40,21 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
     const [protein, setProtein] = useState<number | null>(null);
     const [carbs, setCarbs] = useState<number | null>(null);
     const [fat, setFat] = useState<number | null>(null);
+    const [sodium, setSodium] = useState<number | null>(null);
+    const [sugar, setSugar] = useState<number | null>(null);
     const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
+
+    const resetForm = useCallback(() => {
+        setMeal('');
+        setItem('');
+        setPortionSize('');
+        setCalories(null);
+        setProtein(null);
+        setCarbs(null);
+        setFat(null);
+        setSodium(null);
+        setSugar(null);
+    }, []);
 
     useEffect(() => {
         if (foodToEdit) {
@@ -51,37 +65,34 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
             setProtein(foodToEdit.protein);
             setCarbs(foodToEdit.carbs);
             setFat(foodToEdit.fat);
-        } else {
-            // Reset form when dialog is opened for adding, or closed
-            setMeal('');
-            setItem('');
-            setPortionSize('');
-            setCalories(null);
-            setProtein(null);
-            setCarbs(null);
-            setFat(null);
+            setSodium(foodToEdit.sodium);
+            setSugar(foodToEdit.sugar);
+        } else if (!isOpen) {
+            resetForm();
         }
-    }, [foodToEdit, isOpen]);
+    }, [foodToEdit, isOpen, resetForm]);
 
 
     const handleSubmit = () => {
-        if (meal && item && portionSize && calories !== null && protein !== null && carbs !== null && fat !== null) {
+        if (isSubmittable) {
              if (foodToEdit) {
-                onEditFood({ ...foodToEdit, meal, item, portionSize, calories, protein, carbs, fat });
+                onEditFood({ ...foodToEdit, meal, item, portionSize, calories: calories!, protein: protein!, carbs: carbs!, fat: fat!, sodium: sodium!, sugar: sugar! });
             } else {
-                onAddFood({ meal, item, portionSize, calories, protein, carbs, fat });
+                onAddFood({ meal, item, portionSize, calories: calories!, protein: protein!, carbs: carbs!, fat: fat!, sodium: sodium!, sugar: sugar! });
             }
             onOpenChange(false);
         }
     }
     
-    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; portionSize: string; protein: number, carbs: number, fat: number }) => {
-        setItem(analysisResult.dishName);
+    const handleAnalysisComplete = useCallback((analysisResult: any) => {
+        setItem(analysisResult.dishName || analysisResult.productName);
         setPortionSize(analysisResult.portionSize);
         setCalories(analysisResult.calories);
         setProtein(analysisResult.protein);
         setCarbs(analysisResult.carbs);
         setFat(analysisResult.fat);
+        setSodium(analysisResult.sodium);
+        setSugar(analysisResult.sugar);
         setAnalyzeOpen(false);
     }, []);
 
@@ -123,7 +134,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
           </div>
            <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="portionSize" className="text-right">
-              Portion Size
+              Portion
             </Label>
             <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder="e.g., 1 cup" className="col-span-3" />
           </div>
@@ -135,6 +146,8 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
                     <div className='flex justify-between'><span className='text-muted-foreground'>Protein:</span> <span className='font-medium'>{protein} g</span></div>
                     <div className='flex justify-between'><span className='text-muted-foreground'>Carbs:</span> <span className='font-medium'>{carbs} g</span></div>
                     <div className='flex justify-between'><span className='text-muted-foreground'>Fat:</span> <span className='font-medium'>{fat} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Sodium:</span> <span className='font-medium'>{sodium} mg</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Sugar:</span> <span className='font-medium'>{sugar} g</span></div>
                 </div>
              </div>
           )}

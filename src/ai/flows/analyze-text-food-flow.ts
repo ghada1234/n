@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -32,6 +33,8 @@ const FoodAnalysisTextOutputSchema = z.object({
     .number()
     .describe('The estimated grams of carbohydrates for the dish.'),
   fat: z.number().describe('The estimated grams of fat for the dish.'),
+  sodium: z.number().describe('The estimated milligrams of sodium for the dish.'),
+  sugar: z.number().describe('The estimated grams of sugar for the dish.'),
   portionSize: z
     .string()
     .describe('The estimated portion size (e.g., "1 cup", "100g").'),
@@ -51,7 +54,7 @@ const prompt = ai.definePrompt({
   input: { schema: FoodAnalysisTextInputSchema },
   output: { schema: FoodAnalysisTextOutputSchema },
   prompt: `You are an expert nutritionist. Analyze the following description of a meal and identify the dish.
-Provide the most common name for this dish. Also, provide an estimate of the total calories, protein, carbs, and fat in grams, and the portion size for the described meal.
+Provide the most common name for this dish. Also, provide an estimate of the total calories, protein, carbs, fat, sodium (in mg), sugar (in grams), and the portion size for the described meal.
 
 Description: {{{description}}}`,
 });

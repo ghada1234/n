@@ -47,6 +47,8 @@ export interface FoodLogEntry {
   protein: number;
   carbs: number;
   fat: number;
+  sodium: number;
+  sugar: number;
 }
 
 export interface ExerciseLogEntry {
@@ -57,10 +59,10 @@ export interface ExerciseLogEntry {
 }
 
 const initialFoodLog: FoodLogEntry[] = [
-  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', portionSize: '1 cup', calories: 350, protein: 10, carbs: 60, fat: 8 },
-  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', portionSize: '1 bowl', calories: 450, protein: 40, carbs: 20, fat: 25 },
-  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', portionSize: '1 filet', calories: 550, protein: 45, carbs: 40, fat: 28 },
-  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', portionSize: '1 apple, 2 tbsp', calories: 230, protein: 8, carbs: 25, fat: 15 },
+  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', portionSize: '1 cup', calories: 350, protein: 10, carbs: 60, fat: 8, sodium: 150, sugar: 12 },
+  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', portionSize: '1 bowl', calories: 450, protein: 40, carbs: 20, fat: 25, sodium: 300, sugar: 5 },
+  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', portionSize: '1 filet', calories: 550, protein: 45, carbs: 40, fat: 28, sodium: 400, sugar: 3 },
+  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', portionSize: '1 apple, 2 tbsp', calories: 230, protein: 8, carbs: 25, fat: 15, sodium: 100, sugar: 18 },
 ];
 
 const initialExerciseLog: ExerciseLogEntry[] = [
@@ -191,10 +193,13 @@ const LogTabs = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Item</TableHead>
+                  <TableHead>Portion</TableHead>
                   <TableHead className="text-right">Calories</TableHead>
                   <TableHead className="text-right">Protein</TableHead>
                   <TableHead className="text-right">Carbs</TableHead>
                   <TableHead className="text-right">Fat</TableHead>
+                  <TableHead className="text-right">Sugar</TableHead>
+                  <TableHead className="text-right">Sodium</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -203,12 +208,15 @@ const LogTabs = () => {
                   <TableRow key={entry.id}>
                     <TableCell>
                       <div className="font-medium">{entry.item}</div>
-                      <div className="text-sm text-muted-foreground">{entry.meal} - {entry.portionSize}</div>
+                      <div className="text-sm text-muted-foreground">{entry.meal}</div>
                     </TableCell>
+                    <TableCell>{entry.portionSize}</TableCell>
                     <TableCell className="text-right">{entry.calories}</TableCell>
                     <TableCell className="text-right">{entry.protein}g</TableCell>
                     <TableCell className="text-right">{entry.carbs}g</TableCell>
                     <TableCell className="text-right">{entry.fat}g</TableCell>
+                    <TableCell className="text-right">{entry.sugar}g</TableCell>
+                    <TableCell className="text-right">{entry.sodium}mg</TableCell>
                     <TableCell className="text-right">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
