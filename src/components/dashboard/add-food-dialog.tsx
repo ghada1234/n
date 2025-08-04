@@ -36,7 +36,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
     const [portionSize, setPortionSize] = useState('');
-    const [calories, setCalories] = useState('');
+    const [calories, setCalories] = useState<number | null>(null);
     const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
     useEffect(() => {
@@ -44,19 +44,19 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
             setMeal(foodToEdit.meal);
             setItem(foodToEdit.item);
             setPortionSize(foodToEdit.portionSize);
-            setCalories(String(foodToEdit.calories));
+            setCalories(foodToEdit.calories);
         } else {
             // Reset form when dialog is opened for adding, or closed
             setMeal('');
             setItem('');
             setPortionSize('');
-            setCalories('');
+            setCalories(null);
         }
     }, [foodToEdit, isOpen]);
 
 
     const handleSubmit = () => {
-        if (meal && item && portionSize && calories) {
+        if (meal && item && portionSize && calories !== null) {
              if (foodToEdit) {
                 onEditFood({ ...foodToEdit, meal, item, portionSize, calories: Number(calories) });
             } else {
@@ -69,10 +69,11 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
     const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; portionSize: string }) => {
         setItem(analysisResult.dishName);
         setPortionSize(analysisResult.portionSize);
-        setCalories(String(analysisResult.calories));
+        setCalories(analysisResult.calories);
         setAnalyzeOpen(false);
     }, []);
 
+    const isSubmittable = meal && item && portionSize && calories !== null;
 
   return (
     <>
@@ -81,7 +82,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
         <DialogHeader>
           <DialogTitle>{foodToEdit ? 'Edit Food Item' : 'Add Food Item'}</DialogTitle>
           <DialogDescription>
-             {foodToEdit ? 'Update the details of your food item.' : 'Log a new food item to your daily journal.'}
+             {foodToEdit ? 'Update the details of your food item.' : 'Log a new food item to your daily journal using the AI Analyzer.'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -102,7 +103,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
                 </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="item" className="text-right">
               Food
             </Label>
@@ -114,19 +115,20 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
             </Label>
             <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder="e.g., 1 cup" className="col-span-3" />
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="calories" className="text-right">
-              Calories
-            </Label>
-            <Input id="calories" type="number" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g., 95" className="col-span-3" />
-          </div>
+          {calories !== null && (
+             <div className="grid grid-cols-4 items-center gap-4">
+                <Label className="text-right">Calories</Label>
+                <div className="col-span-3 font-medium text-foreground">{calories} kcal</div>
+             </div>
+          )}
           <Button variant="outline" onClick={() => setAnalyzeOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
             Analyze with AI
           </Button>
+          {!isSubmittable && !foodToEdit && <p className="text-center text-sm text-muted-foreground">Please use the AI Analyzer to determine calories before logging.</p>}
         </div>
         <DialogFooter>
-            <Button onClick={handleSubmit}>{foodToEdit ? 'Save Changes' : 'Add to Log'}</Button>
+            <Button onClick={handleSubmit} disabled={!isSubmittable}>{foodToEdit ? 'Save Changes' : 'Add to Log'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
