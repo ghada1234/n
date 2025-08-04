@@ -12,9 +12,6 @@ const NavLinks = () => (
         <Link href="/about" className="text-muted-foreground transition-colors hover:text-foreground">
             About
         </Link>
-        <Link href="/dashboard" className="text-muted-foreground transition-colors hover:text-foreground">
-            App
-        </Link>
     </>
 )
 
