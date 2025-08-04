@@ -17,14 +17,6 @@ export default function AboutPage() {
                     </p>
                 </div>
                  <div className="relative">
-                    <Image
-                        src="https://placehold.co/600x400.png"
-                        alt="Team working"
-                        width={600}
-                        height={400}
-                        className="mx-auto aspect-video overflow-hidden rounded-xl object-cover"
-                        data-ai-hint="team collaboration"
-                    />
                 </div>
             </div>
 
@@ -40,9 +32,6 @@ export default function AboutPage() {
             <div className="grid max-w-4xl mx-auto gap-10 sm:grid-cols-1">
                  <div className="flex flex-col items-center text-center">
                      <Avatar className="h-32 w-32 mb-4">
-                        <AvatarImage asChild src="https://placehold.co/128x128.png">
-                            <Image src="https://placehold.co/128x128.png" alt="Ghada Alani" width={128} height={128} data-ai-hint="professional woman portrait"/>
-                        </AvatarImage>
                         <AvatarFallback>GA</AvatarFallback>
                     </Avatar>
                     <h3 className="text-2xl font-bold font-headline">Ghada Alani</h3>

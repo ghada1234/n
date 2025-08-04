@@ -13,16 +13,7 @@ const ProfileForm = () => {
     <form className="space-y-8">
       <div className="flex items-center gap-8">
         <Avatar className="h-24 w-24">
-          <AvatarImage asChild src="https://placehold.co/100x100.png">
-            <Image
-              src="https://placehold.co/100x100.png"
-              width={100}
-              height={100}
-              alt="User Avatar"
-              data-ai-hint="person portrait"
-            />
-          </AvatarImage>
-          <AvatarFallback>UN</AvatarFallback>
+          <AvatarFallback>AD</AvatarFallback>
         </Avatar>
         <div className="space-y-2">
             <h3 className="text-2xl font-headline">Alex Doe</h3>
