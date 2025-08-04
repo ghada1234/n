@@ -11,18 +11,20 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Camera, ScanBarcode, RefreshCw } from 'lucide-react';
+import { Loader2, Camera, ScanBarcode, RefreshCw, Type } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { lookupBarcode } from '@/ai/flows/barcode-lookup';
 import { analyzeFood } from '@/ai/flows/analyze-food-flow';
+import { analyzeTextFood } from '@/ai/flows/analyze-text-food-flow';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs';
-
+import { Textarea } from '../ui/textarea';
+import { Label } from '../ui/label';
 
 interface AnalyzeFoodDialogProps {
   isOpen: boolean;
@@ -46,16 +48,18 @@ export default function AnalyzeFoodDialog({
   const { toast } = useToast();
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('environment');
   const [isBarcodeSupported, setIsBarcodeSupported] = useState(false);
-  const [analysisMode, setAnalysisMode] = useState<'photo' | 'barcode'>('photo');
-  const [barcode, setBarcode] = useState<string | null>(null);
+  const [analysisMode, setAnalysisMode] = useState<'photo' | 'barcode' | 'text'>('photo');
+  const [textDescription, setTextDescription] = useState('');
   const detectionInterval = useRef<NodeJS.Timeout>();
   
   useEffect(() => {
     setIsBarcodeSupported(isBarcodeDetectorSupported());
   }, []);
 
+  const requiresCamera = analysisMode === 'photo' || analysisMode === 'barcode';
+
   useEffect(() => {
-    if (!isOpen) {
+    if (!isOpen || !requiresCamera) {
         if (detectionInterval.current) {
             clearInterval(detectionInterval.current);
         }
@@ -94,11 +98,10 @@ export default function AnalyzeFoodDialog({
             clearInterval(detectionInterval.current);
         }
     }
-  }, [isOpen, facingMode, toast]);
+  }, [isOpen, facingMode, toast, requiresCamera]);
   
   const handleBarcodeLookup = useCallback(async (barcodeValue: string) => {
     setIsLoading(true);
-    setBarcode(barcodeValue);
     try {
         const result = await lookupBarcode({ barcode: barcodeValue });
         if (result.notFound || !result.productName) {
@@ -201,6 +204,28 @@ export default function AnalyzeFoodDialog({
     }
   };
 
+  const handleTextAnalyze = async () => {
+    if (!textDescription) return;
+    setIsLoading(true);
+    try {
+        const result = await analyzeTextFood({ description: textDescription });
+        if (result) {
+            onAnalysisComplete(result);
+        }
+    } catch (error) {
+        console.error('Text analysis failed:', error);
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
+        toast({
+            variant: 'destructive',
+            title: 'Analysis Failed',
+            description: errorMessage,
+        });
+    } finally {
+        setIsLoading(false);
+    }
+  };
+
+
   const switchCamera = () => {
     setFacingMode(prev => (prev === 'user' ? 'environment' : 'user'));
   };
@@ -215,10 +240,11 @@ export default function AnalyzeFoodDialog({
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'photo' | 'barcode')} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="photo">Take Photo</TabsTrigger>
-                <TabsTrigger value="barcode" disabled={!isBarcodeSupported}>Scan Barcode</TabsTrigger>
+        <Tabs value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'photo' | 'barcode' | 'text')} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="photo">Photo</TabsTrigger>
+                <TabsTrigger value="barcode" disabled={!isBarcodeSupported}>Barcode</TabsTrigger>
+                <TabsTrigger value="text">Text</TabsTrigger>
             </TabsList>
             <TabsContent value="photo">
                 <div className="relative mt-2">
@@ -226,7 +252,7 @@ export default function AnalyzeFoodDialog({
                    {isLoading && (
                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
                       <Loader2 className="h-8 w-8 animate-spin text-white" />
-                      <p className="text-white mt-2">Analyzing...</p>
+                      <p className="text-white mt-2">Analyzing Photo...</p>
                     </div>
                   )}
                 </div>
@@ -245,9 +271,27 @@ export default function AnalyzeFoodDialog({
                    </div>
                 </div>
             </TabsContent>
+            <TabsContent value="text">
+                <div className="space-y-2 mt-2">
+                    <Label htmlFor="text-description">Describe your meal</Label>
+                    <Textarea
+                        id="text-description"
+                        placeholder="e.g., A bowl of oatmeal with berries and nuts"
+                        value={textDescription}
+                        onChange={(e) => setTextDescription(e.target.value)}
+                        disabled={isLoading}
+                    />
+                </div>
+                 {isLoading && analysisMode === 'text' && (
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
+                        <Loader2 className="h-8 w-8 animate-spin text-white" />
+                        <p className="text-white mt-2">Analyzing Text...</p>
+                    </div>
+                )}
+            </TabsContent>
         </Tabs>
 
-        {hasCameraPermission === false && (
+        {hasCameraPermission === false && requiresCamera && (
           <Alert variant="destructive">
             <AlertTitle>Camera Access Required</AlertTitle>
             <AlertDescription>
@@ -257,20 +301,29 @@ export default function AnalyzeFoodDialog({
         )}
         
         <DialogFooter className="sm:justify-between flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={switchCamera} disabled={isLoading || !hasCameraPermission}>
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Switch Camera
-            </Button>
+            {requiresCamera && (
+              <Button variant="outline" onClick={switchCamera} disabled={isLoading || !hasCameraPermission}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Switch Camera
+              </Button>
+            )}
 
-            {analysisMode === 'photo' ? (
+            {analysisMode === 'photo' && (
                 <Button onClick={handleCaptureAndAnalyze} disabled={isLoading || !hasCameraPermission}>
                     <Camera className="mr-2 h-4 w-4" />
                     Analyze Photo
                 </Button>
-            ) : (
-                <Button onClick={() => setBarcode(null)} disabled={isLoading || !hasCameraPermission}>
+            )}
+            {analysisMode === 'barcode' && (
+                 <Button onClick={() => {if(detectionInterval.current) clearInterval(detectionInterval.current); startBarcodeDetection()}} disabled={isLoading || !hasCameraPermission}>
                     <ScanBarcode className="mr-2 h-4 w-4" />
                     Rescan
+                </Button>
+            )}
+             {analysisMode === 'text' && (
+                <Button onClick={handleTextAnalyze} disabled={isLoading || !textDescription}>
+                    <Type className="mr-2 h-4 w-4" />
+                    Analyze Text
                 </Button>
             )}
         </DialogFooter>
