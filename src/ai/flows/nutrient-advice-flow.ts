@@ -12,7 +12,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-export const NutrientAdviceInputSchema = z.object({
+const NutrientAdviceInputSchema = z.object({
   height: z.number().describe('The user\'s height in centimeters.'),
   weight: z.number().describe('The user\'s weight in kilograms.'),
   age: z.number().describe('The user\'s age in years.'),
@@ -20,7 +20,7 @@ export const NutrientAdviceInputSchema = z.object({
 });
 export type NutrientAdviceInput = z.infer<typeof NutrientAdviceInputSchema>;
 
-export const NutrientAdviceOutputSchema = z.object({
+const NutrientAdviceOutputSchema = z.object({
   bmi: z.number().describe('The calculated Body Mass Index (BMI).'),
   bmiCategory: z.string().describe('The BMI category (e.g., "Underweight", "Normal weight", "Overweight").'),
   healthyWeightRange: z.string().describe('The healthy weight range for the user\'s height, formatted as "min kg - max kg".'),

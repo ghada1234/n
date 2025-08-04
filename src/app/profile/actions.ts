@@ -9,11 +9,16 @@ import {
 import { z } from 'zod';
 import { en } from '@/lib/dictionaries/en';
 import { ar } from '@/lib/dictionaries/ar';
-import { NutrientAdviceInputSchema } from '@/ai/flows/nutrient-advice-flow';
-
 
 // This is a server action, so we can't use the hook. We'll get the language from the form data.
 const getTranslations = (lang: 'en' | 'ar') => (lang === 'ar' ? ar : en);
+
+const NutrientAdviceActionSchema = z.object({
+    height: z.number({invalid_type_error: 'Height must be a number.'}).positive(),
+    weight: z.number({invalid_type_error: 'Weight must be a number.'}).positive(),
+    age: z.number({invalid_type_error: 'Age must be a number.'}).positive(),
+    goal: z.string().min(1, 'Goal cannot be empty.'),
+  });
 
 
 export async function generateNutrientAdviceAction(
@@ -27,7 +32,7 @@ export async function generateNutrientAdviceAction(
   const lang = (formData.get('language') || 'en') as 'en' | 'ar';
   const t = getTranslations(lang);
 
-  const validatedFields = NutrientAdviceInputSchema.safeParse({
+  const validatedFields = NutrientAdviceActionSchema.safeParse({
     height: Number(formData.get('height')),
     weight: Number(formData.get('currentWeight')),
     age: Number(formData.get('age')),
