@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview An AI agent that analyzes a photo of food to identify the dish and estimate its calorie content.
+ * @fileOverview An AI agent that analyzes a photo of food to identify the dish and estimate its calorie and macronutrient content.
  *
  * - analyzeFood - A function that handles the food analysis process.
  * - FoodAnalysisInput - The input type for the analyzeFood function.
@@ -23,6 +23,9 @@ export type FoodAnalysisInput = z.infer<typeof FoodAnalysisInputSchema>;
 const FoodAnalysisOutputSchema = z.object({
   dishName: z.string().describe('The name of the identified dish.'),
   calories: z.number().describe('The estimated number of calories for the dish.'),
+  protein: z.number().describe('The estimated grams of protein for the dish.'),
+  carbs: z.number().describe('The estimated grams of carbohydrates for the dish.'),
+  fat: z.number().describe('The estimated grams of fat for the dish.'),
   portionSize: z.string().describe('The estimated portion size (e.g., "1 cup", "100g").'),
 });
 export type FoodAnalysisOutput = z.infer<typeof FoodAnalysisOutputSchema>;
@@ -36,7 +39,7 @@ const prompt = ai.definePrompt({
   input: { schema: FoodAnalysisInputSchema },
   output: { schema: FoodAnalysisOutputSchema },
   prompt: `You are an expert nutritionist. Analyze the following photo of a meal and identify the dish.
-Provide the most common name for this dish. Also, provide an estimate of the total calories and portion size for the portion shown.
+Provide the most common name for this dish. Also, provide an estimate of the total calories, protein, carbs, and fat in grams, and the portion size for the portion shown.
 
 Photo: {{media url=photoDataUri}}`,
 });

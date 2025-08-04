@@ -27,7 +27,7 @@ import {
 interface AnalyzeFoodDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onAnalysisComplete: (result: { dishName: string; calories: number; portionSize: string; }) => void;
+  onAnalysisComplete: (result: { dishName: string; calories: number; portionSize: string; protein: number; carbs: number; fat: number; }) => void;
 }
 
 const isBarcodeDetectorSupported = () => {
@@ -111,6 +111,9 @@ export default function AnalyzeFoodDialog({
             onAnalysisComplete({
                 dishName: result.productName,
                 calories: result.calories ?? 0,
+                protein: result.protein ?? 0,
+                carbs: result.carbs ?? 0,
+                fat: result.fat ?? 0,
                 portionSize: "1 serving" // Default portion size for barcodes
             });
         }
@@ -183,11 +186,7 @@ export default function AnalyzeFoodDialog({
     try {
       const result = await analyzeFood({ photoDataUri });
       if (result) {
-        onAnalysisComplete({
-          dishName: result.dishName,
-          calories: result.calories,
-          portionSize: result.portionSize,
-        });
+        onAnalysisComplete(result);
       }
     } catch (error) {
       console.error('Food analysis failed:', error);

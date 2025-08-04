@@ -280,7 +280,7 @@ const SuggestionForm = () => {
                                             {meal.day && <span className="text-primary mr-2">{meal.day}:</span>}
                                             {meal.mealName}
                                         </h4>
-                                        <p className='text-sm text-muted-foreground'>(~{meal.calories} kcal)</p>
+                                        <p className='text-sm text-muted-foreground'>~{meal.calories} kcal &bull; P: {meal.protein}g, C: {meal.carbs}g, F: {meal.fat}g</p>
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent>

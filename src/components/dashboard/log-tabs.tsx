@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Tabs,
   TabsContent,
@@ -36,6 +36,7 @@ import { PlusCircle, Search, MoreHorizontal, Pencil, Trash2, Copy } from 'lucide
 import { Input } from '../ui/input';
 import AddFoodDialog from './add-food-dialog';
 import AddExerciseDialog from './add-exercise-dialog';
+import SummaryCards from './summary-cards';
 
 export interface FoodLogEntry {
   id: number;
@@ -43,6 +44,9 @@ export interface FoodLogEntry {
   item: string;
   portionSize: string;
   calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
 }
 
 export interface ExerciseLogEntry {
@@ -53,10 +57,10 @@ export interface ExerciseLogEntry {
 }
 
 const initialFoodLog: FoodLogEntry[] = [
-  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', portionSize: '1 cup', calories: 350 },
-  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', portionSize: '1 bowl', calories: 450 },
-  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', portionSize: '1 filet', calories: 550 },
-  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', portionSize: '1 apple, 2 tbsp', calories: 230 },
+  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', portionSize: '1 cup', calories: 350, protein: 10, carbs: 60, fat: 8 },
+  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', portionSize: '1 bowl', calories: 450, protein: 40, carbs: 20, fat: 25 },
+  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', portionSize: '1 filet', calories: 550, protein: 45, carbs: 40, fat: 28 },
+  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', portionSize: '1 apple, 2 tbsp', calories: 230, protein: 8, carbs: 25, fat: 15 },
 ];
 
 const initialExerciseLog: ExerciseLogEntry[] = [
@@ -88,7 +92,7 @@ const LogTabs = () => {
         setFoodLog(prevLog => prevLog.filter(entry => entry.id !== id));
     }
     const handleLogAgainFood = (foodEntry: FoodLogEntry) => {
-        handleAddFood({ meal: foodEntry.meal, item: foodEntry.item, portionSize: foodEntry.portionSize, calories: foodEntry.calories });
+        handleAddFood({ ...foodEntry });
     }
     const openEditFoodDialog = (foodEntry: FoodLogEntry) => {
         setEditingFood(foodEntry);
@@ -137,9 +141,27 @@ const LogTabs = () => {
         entry.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const summaryData = useMemo(() => {
+        const consumed = foodLog.reduce((acc, entry) => {
+            acc.calories += entry.calories;
+            acc.protein += entry.protein;
+            acc.carbs += entry.carbs;
+            acc.fat += entry.fat;
+            return acc;
+        }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+        const burned = exerciseLog.reduce((acc, entry) => acc + entry.caloriesBurned, 0);
+        
+        return {
+            consumed,
+            burned,
+        }
+    }, [foodLog, exerciseLog]);
+
   return (
     <>
-    <Tabs value={activeTab} onValueChange={setActiveTab}>
+    <SummaryCards summaryData={summaryData} />
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
       <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="food">Food Log</TabsTrigger>
@@ -168,20 +190,25 @@ const LogTabs = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Meal</TableHead>
                   <TableHead>Item</TableHead>
-                  <TableHead>Portion</TableHead>
                   <TableHead className="text-right">Calories</TableHead>
+                  <TableHead className="text-right">Protein</TableHead>
+                  <TableHead className="text-right">Carbs</TableHead>
+                  <TableHead className="text-right">Fat</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredFoodLog.map((entry) => (
                   <TableRow key={entry.id}>
-                    <TableCell className="font-medium">{entry.meal}</TableCell>
-                    <TableCell>{entry.item}</TableCell>
-                    <TableCell>{entry.portionSize}</TableCell>
+                    <TableCell>
+                      <div className="font-medium">{entry.item}</div>
+                      <div className="text-sm text-muted-foreground">{entry.meal} - {entry.portionSize}</div>
+                    </TableCell>
                     <TableCell className="text-right">{entry.calories}</TableCell>
+                    <TableCell className="text-right">{entry.protein}g</TableCell>
+                    <TableCell className="text-right">{entry.carbs}g</TableCell>
+                    <TableCell className="text-right">{entry.fat}g</TableCell>
                     <TableCell className="text-right">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>

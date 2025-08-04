@@ -42,6 +42,9 @@ const MealSuggestionOutputSchema = z.object({
         mealName: z.string().describe('The name of the suggested meal.'),
         description: z.string().describe('A brief description of the meal.'),
         calories: z.number().describe('Estimated calories for the meal.'),
+        protein: z.number().describe('The estimated grams of protein for the meal.'),
+        carbs: z.number().describe('The estimated grams of carbohydrates for the meal.'),
+        fat: z.number().describe('The estimated grams of fat for the meal.'),
         ingredients: z.array(z.string()).describe('A list of ingredients for the meal.'),
         instructions: z.string().describe('The cooking instructions for the meal, formatted as a single string with newlines.'),
       })
@@ -74,7 +77,7 @@ Target Macro Ratio (Protein/Carbs/Fat): {{{macroRatio}}}
 - For 'Weekly' plans, provide 3 meals (breakfast, lunch, dinner) for each of the 7 days.
 - For 'Monthly' plans, provide a sample 7-day plan that can be repeated or varied.
 - Ensure suggestions are culturally relevant to the specified nationality.
-- For each suggestion, provide the meal name, a short description, an estimated calorie count, a list of ingredients, and step-by-step instructions.
+- For each suggestion, provide the meal name, a short description, an estimated calorie count, a macronutrient breakdown (protein, carbs, fat in grams), a list of ingredients, and step-by-step instructions.
 - For weekly/monthly plans, include the 'day' for each suggestion.
 `,
 });

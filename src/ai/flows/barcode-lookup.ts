@@ -23,7 +23,7 @@ const getProductInfoFromBarcode = ai.defineTool(
   },
   async ({ barcode }) => {
     try {
-      const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json`);
+      const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_en,nutriments,status,status_verbose`);
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
       }
@@ -48,6 +48,9 @@ export type BarcodeLookupInput = z.infer<typeof BarcodeLookupInputSchema>;
 const BarcodeLookupOutputSchema = z.object({
   productName: z.string().optional().describe('The name of the product.'),
   calories: z.number().optional().describe('The number of calories per serving.'),
+  protein: z.number().optional().describe('The grams of protein per serving.'),
+  carbs: z.number().optional().describe('The grams of carbohydrates per serving.'),
+  fat: z.number().optional().describe('The grams of fat per serving.'),
   notFound: z.boolean().optional().describe('Set to true if the product is not found.'),
 });
 export type BarcodeLookupOutput = z.infer<typeof BarcodeLookupOutputSchema>;
@@ -63,10 +66,14 @@ A user has provided a barcode: {{{barcode}}}.
 
 Your task is to use the getProductInfoFromBarcode tool to find the product information for this barcode.
 
-From the tool's output, extract the product name ('product_name' or 'product_name_en') and the calorie count per serving ('nutriments.energy-kcal_100g' or 'nutriments.energy-kcal').
+From the tool's output, extract the product name ('product_name' or 'product_name_en') and the nutritional information for a standard serving size (usually 100g).
+- Calories: 'nutriments.energy-kcal_100g' or 'nutriments.energy-kcal_serving'
+- Protein: 'nutriments.proteins_100g' or 'nutriments.proteins_serving'
+- Carbohydrates: 'nutriments.carbohydrates_100g' or 'nutriments.carbohydrates_serving'
+- Fat: 'nutriments.fat_100g' or 'nutriments.fat_serving'
 
-- If the product is found and has the required information, return the 'productName' and 'calories'.
-- If the product is found but calorie information is missing, return the 'productName' with calories as 0.
+- If the product is found and has the required information, return the 'productName', 'calories', 'protein', 'carbs', and 'fat'.
+- If the product is found but some nutritional information is missing, return what is available and use 0 for the missing values.
 - If the 'status' from the API is 0 or the product is not found, return 'notFound: true'.`
 });
   

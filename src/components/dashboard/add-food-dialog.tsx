@@ -37,6 +37,9 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
     const [item, setItem] = useState('');
     const [portionSize, setPortionSize] = useState('');
     const [calories, setCalories] = useState<number | null>(null);
+    const [protein, setProtein] = useState<number | null>(null);
+    const [carbs, setCarbs] = useState<number | null>(null);
+    const [fat, setFat] = useState<number | null>(null);
     const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
     useEffect(() => {
@@ -45,31 +48,40 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
             setItem(foodToEdit.item);
             setPortionSize(foodToEdit.portionSize);
             setCalories(foodToEdit.calories);
+            setProtein(foodToEdit.protein);
+            setCarbs(foodToEdit.carbs);
+            setFat(foodToEdit.fat);
         } else {
             // Reset form when dialog is opened for adding, or closed
             setMeal('');
             setItem('');
             setPortionSize('');
             setCalories(null);
+            setProtein(null);
+            setCarbs(null);
+            setFat(null);
         }
     }, [foodToEdit, isOpen]);
 
 
     const handleSubmit = () => {
-        if (meal && item && portionSize && calories !== null) {
+        if (meal && item && portionSize && calories !== null && protein !== null && carbs !== null && fat !== null) {
              if (foodToEdit) {
-                onEditFood({ ...foodToEdit, meal, item, portionSize, calories: Number(calories) });
+                onEditFood({ ...foodToEdit, meal, item, portionSize, calories, protein, carbs, fat });
             } else {
-                onAddFood({ meal, item, portionSize, calories: Number(calories) });
+                onAddFood({ meal, item, portionSize, calories, protein, carbs, fat });
             }
             onOpenChange(false);
         }
     }
     
-    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; portionSize: string }) => {
+    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; portionSize: string; protein: number, carbs: number, fat: number }) => {
         setItem(analysisResult.dishName);
         setPortionSize(analysisResult.portionSize);
         setCalories(analysisResult.calories);
+        setProtein(analysisResult.protein);
+        setCarbs(analysisResult.carbs);
+        setFat(analysisResult.fat);
         setAnalyzeOpen(false);
     }, []);
 
@@ -116,16 +128,21 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
             <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder="e.g., 1 cup" className="col-span-3" />
           </div>
           {calories !== null && (
-             <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-right">Calories</Label>
-                <div className="col-span-3 font-medium text-foreground">{calories} kcal</div>
+             <div className="grid grid-cols-4 items-start gap-4 rounded-md border p-4 bg-muted/50">
+                <Label className="text-right col-span-1 pt-1">Nutrients</Label>
+                <div className="col-span-3 grid gap-1 text-sm">
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Calories:</span> <span className='font-medium'>{calories} kcal</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Protein:</span> <span className='font-medium'>{protein} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Carbs:</span> <span className='font-medium'>{carbs} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>Fat:</span> <span className='font-medium'>{fat} g</span></div>
+                </div>
              </div>
           )}
           <Button variant="outline" onClick={() => setAnalyzeOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
             Analyze with AI
           </Button>
-          {!isSubmittable && !foodToEdit && <p className="text-center text-sm text-muted-foreground">Please use the AI Analyzer to determine calories before logging.</p>}
+          {!isSubmittable && !foodToEdit && <p className="text-center text-sm text-muted-foreground">Please use the AI Analyzer to determine nutrients before logging.</p>}
         </div>
         <DialogFooter>
             <Button onClick={handleSubmit} disabled={!isSubmittable}>{foodToEdit ? 'Save Changes' : 'Add to Log'}</Button>

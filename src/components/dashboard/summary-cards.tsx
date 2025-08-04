@@ -7,15 +7,27 @@ import {
 } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 
-const SummaryCards = () => {
-  const calorieData = { consumed: 1580, goal: 2200 };
-  const exerciseData = { burned: 320 };
-  const macroData = {
-    protein: { consumed: 120, goal: 150 },
-    carbs: { consumed: 180, goal: 250 },
-    fat: { consumed: 50, goal: 70 },
+interface SummaryCardsProps {
+    summaryData: {
+        consumed: {
+            calories: number;
+            protein: number;
+            carbs: number;
+            fat: number;
+        };
+        burned: number;
+    }
+}
+
+const SummaryCards = ({ summaryData }: SummaryCardsProps) => {
+  const calorieGoal = 2200;
+  const macroGoals = {
+    protein: 150,
+    carbs: 250,
+    fat: 70,
   };
-  const netCalories = calorieData.consumed - exerciseData.burned;
+
+  const netCalories = summaryData.consumed.calories - summaryData.burned;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -27,10 +39,10 @@ const SummaryCards = () => {
         <CardContent>
           <div className="text-2xl font-bold">{netCalories}</div>
           <p className="text-xs text-muted-foreground">
-            {calorieData.consumed} consumed - {exerciseData.burned} burned
+            {summaryData.consumed.calories} consumed - {summaryData.burned} burned
           </p>
           <Progress
-            value={(netCalories / calorieData.goal) * 100}
+            value={(netCalories / calorieGoal) * 100}
             className="mt-2 h-2"
           />
         </CardContent>
@@ -41,12 +53,12 @@ const SummaryCards = () => {
           <Salad className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{macroData.protein.consumed}</div>
+          <div className="text-2xl font-bold">{summaryData.consumed.protein}</div>
           <p className="text-xs text-muted-foreground">
-            Goal: {macroData.protein.goal}g
+            Goal: {macroGoals.protein}g
           </p>
           <Progress
-            value={(macroData.protein.consumed / macroData.protein.goal) * 100}
+            value={(summaryData.consumed.protein / macroGoals.protein) * 100}
             className="mt-2 h-2"
           />
         </CardContent>
@@ -57,12 +69,12 @@ const SummaryCards = () => {
           <Cookie className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{macroData.carbs.consumed}</div>
+          <div className="text-2xl font-bold">{summaryData.consumed.carbs}</div>
           <p className="text-xs text-muted-foreground">
-            Goal: {macroData.carbs.goal}g
+            Goal: {macroGoals.carbs}g
           </p>
           <Progress
-            value={(macroData.carbs.consumed / macroData.carbs.goal) * 100}
+            value={(summaryData.consumed.carbs / macroGoals.carbs) * 100}
             className="mt-2 h-2"
           />
         </CardContent>
@@ -73,12 +85,12 @@ const SummaryCards = () => {
           <Zap className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{macroData.fat.consumed}</div>
+          <div className="text-2xl font-bold">{summaryData.consumed.fat}</div>
           <p className="text-xs text-muted-foreground">
-            Goal: {macroData.fat.goal}g
+            Goal: {macroGoals.fat}g
           </p>
           <Progress
-            value={(macroData.fat.consumed / macroData.fat.goal) * 100}
+            value={(summaryData.consumed.fat / macroGoals.fat) * 100}
             className="mt-2 h-2"
           />
         </CardContent>
