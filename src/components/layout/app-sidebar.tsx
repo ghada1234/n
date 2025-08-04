@@ -16,6 +16,7 @@ import {
   User,
   Utensils,
   Settings,
+  Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -28,6 +29,7 @@ const AppSidebar = () => {
     { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
     { href: '/progress', label: 'Progress', icon: LineChart },
     { href: '/ai-suggestions', label: 'AI Suggestions', icon: Sparkles },
+    { href: '/meal-analyzer', label: 'Meal Analyzer', icon: Camera },
     { href: '/profile', label: 'Profile', icon: User },
   ];
 
