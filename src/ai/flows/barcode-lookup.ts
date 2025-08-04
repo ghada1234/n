@@ -46,8 +46,9 @@ const BarcodeLookupInputSchema = z.object({
 export type BarcodeLookupInput = z.infer<typeof BarcodeLookupInputSchema>;
 
 const BarcodeLookupOutputSchema = z.object({
-  productName: z.string().describe('The name of the product.'),
-  calories: z.number().describe('The number of calories per serving.'),
+  productName: z.string().optional().describe('The name of the product.'),
+  calories: z.number().optional().describe('The number of calories per serving.'),
+  notFound: z.boolean().optional().describe('Set to true if the product is not found.'),
 });
 export type BarcodeLookupOutput = z.infer<typeof BarcodeLookupOutputSchema>;
 
@@ -58,10 +59,15 @@ const prompt = ai.definePrompt({
     output: { schema: BarcodeLookupOutputSchema },
     tools: [getProductInfoFromBarcode],
     prompt: `You are a nutritional information assistant.
-  A user has scanned a barcode. Use the getProductInfoFromBarcode tool to find the product information.
-  From the tool's output, extract the product name and the calorie count per serving.
-  
-  The barcode is: {{{barcode}}}`
+A user has provided a barcode: {{{barcode}}}.
+
+Your task is to use the getProductInfoFromBarcode tool to find the product information for this barcode.
+
+From the tool's output, extract the product name ('product_name' or 'product_name_en') and the calorie count per serving ('nutriments.energy-kcal_100g' or 'nutriments.energy-kcal').
+
+- If the product is found and has the required information, return the 'productName' and 'calories'.
+- If the product is found but calorie information is missing, return the 'productName' with calories as 0.
+- If the 'status' from the API is 0 or the product is not found, return 'notFound: true'.`
 });
   
 

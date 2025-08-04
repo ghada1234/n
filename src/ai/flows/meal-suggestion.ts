@@ -33,7 +33,13 @@ export type MealSuggestionInput = z.infer<typeof MealSuggestionInputSchema>;
 
 const MealSuggestionOutputSchema = z.object({
   mealSuggestions: z
-    .string()
+    .array(
+      z.object({
+        mealName: z.string().describe('The name of the suggested meal.'),
+        description: z.string().describe('A brief description of the meal.'),
+        calories: z.number().describe('Estimated calories for the meal.'),
+      })
+    )
     .describe(
       'A list of meal suggestions that adhere to the dietary restrictions, preferences, calorie goal, and macro ratio.'
     ),
@@ -48,14 +54,15 @@ const prompt = ai.definePrompt({
   name: 'mealSuggestionPrompt',
   input: {schema: MealSuggestionInputSchema},
   output: {schema: MealSuggestionOutputSchema},
-  prompt: `You are a nutritional expert. Generate meal suggestions based on the user's dietary restrictions, preferences, calorie goal and macro ratio.
+  prompt: `You are a nutritional expert. Generate a list of 3 meal suggestions based on the user's dietary restrictions, preferences, calorie goal and macro ratio.
 
 Dietary Restrictions: {{{dietaryRestrictions}}}
 Preferences: {{{preferences}}}
-Calorie Goal: {{{calorieGoal}}}
-Macro Ratio: {{{macroRatio}}}
+Daily Calorie Goal for all meals: {{{calorieGoal}}}
+Target Macro Ratio (Protein/Carbs/Fat): {{{macroRatio}}}
 
-Meal Suggestions:`,
+Provide 3 diverse suggestions for breakfast, lunch, or dinner. For each suggestion, provide the meal name, a short description, and an estimated calorie count.
+`,
 });
 
 const suggestMealFlow = ai.defineFlow(

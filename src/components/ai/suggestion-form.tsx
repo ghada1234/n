@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Sparkles, Loader2, ServerCrash } from 'lucide-react';
+import { Sparkles, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -43,11 +43,11 @@ const SuggestionForm = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.message === 'An unexpected error occurred.') {
+    if (state.message && state.message !== 'success') {
         toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: "There was a problem with our AI service. Please try again later.",
+            description: state.message,
         })
     }
   }, [state, toast])
@@ -71,6 +71,7 @@ const SuggestionForm = () => {
                 id="dietaryRestrictions"
                 name="dietaryRestrictions"
                 placeholder="e.g., Vegetarian, Gluten-Free, Nut Allergy"
+                defaultValue="None"
               />
               {state.errors?.dietaryRestrictions && <p className="text-sm font-medium text-destructive">{state.errors.dietaryRestrictions}</p>}
             </div>
@@ -80,18 +81,19 @@ const SuggestionForm = () => {
                 id="preferences"
                 name="preferences"
                 placeholder="e.g., Love spicy food, dislike cilantro"
+                defaultValue="No major dislikes"
               />
               {state.errors?.preferences && <p className="text-sm font-medium text-destructive">{state.errors.preferences}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="calorieGoal">Daily Calorie Goal</Label>
-                    <Input id="calorieGoal" name="calorieGoal" type="number" placeholder="e.g., 2000" />
+                    <Input id="calorieGoal" name="calorieGoal" type="number" placeholder="e.g., 2000" defaultValue="2000" />
                     {state.errors?.calorieGoal && <p className="text-sm font-medium text-destructive">{state.errors.calorieGoal}</p>}
                 </div>
                 <div className="space-y-2">
                     <Label htmlFor="macroRatio">Macro Ratio (P/C/F)</Label>
-                    <Input id="macroRatio" name="macroRatio" placeholder="e.g., 40/40/20" />
+                    <Input id="macroRatio" name="macroRatio" placeholder="e.g., 40/40/20" defaultValue="40/40/20" />
                     {state.errors?.macroRatio && <p className="text-sm font-medium text-destructive">{state.errors.macroRatio}</p>}
                 </div>
             </div>
@@ -109,9 +111,16 @@ const SuggestionForm = () => {
             Here are some ideas to get you started.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex-1 flex items-center justify-center">
-            {state.data ? (
-                 <div className="whitespace-pre-wrap text-sm">{state.data.mealSuggestions}</div>
+        <CardContent className="flex-1 flex flex-col items-center justify-center p-4">
+            {state.data && state.data.mealSuggestions && state.data.mealSuggestions.length > 0 ? (
+                 <div className="w-full space-y-4">
+                    {state.data.mealSuggestions.map((meal, index) => (
+                        <div key={index} className="rounded-lg border p-4">
+                            <h4 className="font-bold">{meal.mealName} (~{meal.calories} kcal)</h4>
+                            <p className="text-sm text-muted-foreground">{meal.description}</p>
+                        </div>
+                    ))}
+                 </div>
             ) : (
                 <div className="text-center text-muted-foreground p-8">
                     <Sparkles className="mx-auto h-12 w-12" />

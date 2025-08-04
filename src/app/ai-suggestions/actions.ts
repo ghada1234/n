@@ -1,6 +1,6 @@
 'use server';
 
-import { suggestMeal, type MealSuggestionInput } from '@/ai/flows/meal-suggestion';
+import { suggestMeal, type MealSuggestionInput, type MealSuggestionOutput } from '@/ai/flows/meal-suggestion';
 import { z } from 'zod';
 
 const MealSuggestionInputSchema = z.object({
@@ -13,7 +13,11 @@ const MealSuggestionInputSchema = z.object({
 export async function generateMealSuggestion(
   prevState: any,
   formData: FormData
-) {
+): Promise<{
+    message: string;
+    errors: Record<string, string[]> | null;
+    data: MealSuggestionOutput | null;
+}> {
   const validatedFields = MealSuggestionInputSchema.safeParse({
     dietaryRestrictions: formData.get('dietaryRestrictions'),
     preferences: formData.get('preferences'),
@@ -31,6 +35,13 @@ export async function generateMealSuggestion(
 
   try {
     const result = await suggestMeal(validatedFields.data as MealSuggestionInput);
+    if (!result || !result.mealSuggestions || result.mealSuggestions.length === 0) {
+        return {
+            message: 'The AI could not generate suggestions. Please try adjusting your preferences.',
+            errors: null,
+            data: null
+        }
+    }
     return {
         message: 'success',
         errors: null,
@@ -38,8 +49,9 @@ export async function generateMealSuggestion(
     }
   } catch (error) {
     console.error(error);
+    const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return {
-        message: 'An unexpected error occurred.',
+        message: `An AI error occurred: ${errorMessage}`,
         errors: null,
         data: null
     }

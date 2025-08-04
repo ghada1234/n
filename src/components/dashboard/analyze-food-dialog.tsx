@@ -40,6 +40,7 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
   const [isBarcodeSupported, setIsBarcodeSupported] = useState(false);
 
   useEffect(() => {
+    // This check must be in useEffect to avoid server-side rendering errors
     setIsBarcodeSupported(typeof window !== 'undefined' && 'BarcodeDetector' in window);
   }, []);
 
@@ -59,7 +60,7 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
     }
     onOpenChange(open);
   }
-
+  
   const handleBarcodeLookup = useCallback(async (barcodeValue: string) => {
     if (detectionInterval.current) {
         clearInterval(detectionInterval.current);
@@ -73,8 +74,8 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
 
     try {
         const result = await lookupBarcode({ barcode: barcodeValue });
-        if (result) {
-            onAnalysisComplete({ mealName: result.productName, calories: result.calories });
+        if (result && !result.notFound && result.productName) {
+            onAnalysisComplete({ mealName: result.productName, calories: result.calories || 0 });
         } else {
             throw new Error("Product not found.");
         }
@@ -83,10 +84,10 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
         toast({
             variant: 'destructive',
             title: 'Barcode Lookup Failed',
-            description: "Could not find a product for this barcode.",
+            description: "Could not find a product for this barcode. Please try again.",
         });
-        // Restart detection if lookup fails
-        startBarcodeDetection();
+        // Optional: restart detection after a delay if lookup fails
+        // setTimeout(() => startBarcodeDetection(), 1000); 
     } finally {
         setIsLoading(false);
     }
@@ -109,7 +110,6 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
         }
     }, 500);
   }, [barcodeDetector, handleBarcodeLookup]);
-
 
   useEffect(() => {
     if (!isOpen) {
@@ -140,7 +140,7 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
             // Setup barcode detector
             if (isBarcodeSupported) {
                 // @ts-ignore - BarcodeDetector is experimental
-                const detector = new window.BarcodeDetector({ formats: ['ean_13', 'upc_a'] });
+                const detector = new window.BarcodeDetector({ formats: ['ean_13', 'upc_a', 'upc_e', 'ean_8'] });
                 setBarcodeDetector(detector);
             }
 
@@ -166,7 +166,7 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
 
 
   useEffect(() => {
-    if (analysisMode === 'barcode' && barcodeDetector) {
+    if (analysisMode === 'barcode' && barcodeDetector && isOpen) {
         startBarcodeDetection();
     } else {
         if (detectionInterval.current) {
@@ -180,7 +180,7 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
             detectionInterval.current = null;
         }
     };
-  }, [analysisMode, barcodeDetector, startBarcodeDetection]);
+  }, [analysisMode, barcodeDetector, startBarcodeDetection, isOpen]);
 
   const toggleAnalysisMode = () => {
     setAnalysisMode(prev => prev === 'photo' ? 'barcode' : 'photo');
