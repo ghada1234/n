@@ -23,6 +23,7 @@ import type { FoodLogEntry } from './log-tabs';
 import { useState, useCallback, useEffect } from 'react';
 import { Camera } from 'lucide-react';
 import AnalyzeFoodDialog from './analyze-food-dialog';
+import { useLanguage } from '@/hooks/use-language';
 
 interface AddFoodDialogProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ interface AddFoodDialogProps {
 }
 
 export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditFood, foodToEdit }: AddFoodDialogProps) {
+    const { t } = useLanguage();
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
     const [portionSize, setPortionSize] = useState('');
@@ -103,62 +105,62 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{foodToEdit ? 'Edit Food Item' : 'Add Food Item'}</DialogTitle>
+          <DialogTitle>{foodToEdit ? t('editFoodItem') : t('addFoodItem')}</DialogTitle>
           <DialogDescription>
-             {foodToEdit ? 'Update the details of your food item.' : 'Log a new food item to your daily journal using the AI Analyzer.'}
+             {foodToEdit ? t('editFoodDescription') : t('addFoodDescription')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="meal" className="text-right">
-              Meal
+              {t('mealLabel')}
             </Label>
             <Select onValueChange={setMeal} value={meal}>
                 <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a meal" />
+                    <SelectValue placeholder={t('mealPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="Breakfast">Breakfast</SelectItem>
-                    <SelectItem value="Lunch">Lunch</SelectItem>
-                    <SelectItem value="Dinner">Dinner</SelectItem>
-                    <SelectItem value="Snacks">Snacks</SelectItem>
-                    <SelectItem value="Dessert">Dessert</SelectItem>
+                    <SelectItem value="Breakfast">{t('breakfast')}</SelectItem>
+                    <SelectItem value="Lunch">{t('lunch')}</SelectItem>
+                    <SelectItem value="Dinner">{t('dinner')}</SelectItem>
+                    <SelectItem value="Snacks">{t('snacks')}</SelectItem>
+                    <SelectItem value="Dessert">{t('dessert')}</SelectItem>
                 </SelectContent>
             </Select>
           </div>
            <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="item" className="text-right">
-              Food
+              {t('foodLabel')}
             </Label>
-            <Input id="item" value={item} onChange={(e) => setItem(e.target.value)} placeholder="e.g., Apple" className="col-span-3" />
+            <Input id="item" value={item} onChange={(e) => setItem(e.target.value)} placeholder={t('foodPlaceholder')} className="col-span-3" />
           </div>
            <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="portionSize" className="text-right">
-              Portion
+              {t('portionLabel')}
             </Label>
-            <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder="e.g., 1 cup" className="col-span-3" />
+            <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder={t('portionPlaceholder')} className="col-span-3" />
           </div>
           {calories !== null && (
              <div className="grid grid-cols-4 items-start gap-4 rounded-md border p-4 bg-muted/50">
-                <Label className="text-right col-span-1 pt-1">Nutrients</Label>
+                <Label className="text-right col-span-1 pt-1">{t('nutrients')}</Label>
                 <div className="col-span-3 grid gap-1 text-sm">
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Calories:</span> <span className='font-medium'>{calories} kcal</span></div>
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Protein:</span> <span className='font-medium'>{protein} g</span></div>
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Carbs:</span> <span className='font-medium'>{carbs} g</span></div>
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Fat:</span> <span className='font-medium'>{fat} g</span></div>
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Sodium:</span> <span className='font-medium'>{sodium} mg</span></div>
-                    <div className='flex justify-between'><span className='text-muted-foreground'>Sugar:</span> <span className='font-medium'>{sugar} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('calories')}:</span> <span className='font-medium'>{calories} kcal</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('protein')}:</span> <span className='font-medium'>{protein} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('carbs')}:</span> <span className='font-medium'>{carbs} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('fat')}:</span> <span className='font-medium'>{fat} g</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('sodium')}:</span> <span className='font-medium'>{sodium} mg</span></div>
+                    <div className='flex justify-between'><span className='text-muted-foreground'>{t('sugar')}:</span> <span className='font-medium'>{sugar} g</span></div>
                 </div>
              </div>
           )}
           <Button variant="outline" onClick={() => setAnalyzeOpen(true)}>
             <Camera className="mr-2 h-4 w-4" />
-            Analyze with AI
+            {t('analyzeWithAI')}
           </Button>
-          {!isSubmittable && !foodToEdit && <p className="text-center text-sm text-muted-foreground">Please use the AI Analyzer to determine nutrients before logging.</p>}
+          {!isSubmittable && !foodToEdit && <p className="text-center text-sm text-muted-foreground">{t('analyzerPrompt')}</p>}
         </div>
         <DialogFooter>
-            <Button onClick={handleSubmit} disabled={!isSubmittable}>{foodToEdit ? 'Save Changes' : 'Add to Log'}</Button>
+            <Button onClick={handleSubmit} disabled={!isSubmittable}>{foodToEdit ? t('saveChanges') : t('addToLog')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -14,9 +15,11 @@ import { Label } from '@/components/ui/label';
 import { UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/hooks/use-language';
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,39 +30,39 @@ export default function SignupPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle>Create an Account</CardTitle>
+        <CardTitle>{t('createAccount')}</CardTitle>
         <CardDescription>
-          Start your nutrition journey with us today.
+          {t('startYourJourney')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSignup}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input id="name" type="text" placeholder="Alex Doe" required />
+            <Label htmlFor="name">{t('fullNameLabel')}</Label>
+            <Input id="name" type="text" placeholder={t('fullNamePlaceholder')} required />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('emailLabel')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="alex.doe@example.com"
+              placeholder={t('emailPlaceholder')}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('passwordLabel')}</Label>
             <Input id="password" type="password" required />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full">
-            <UserPlus className="mr-2" /> Sign Up
+            <UserPlus className="mr-2" /> {t('signUp')}
           </Button>
           <p className="text-sm text-muted-foreground">
-            {'Already have an account?'}{' '}
+            {t('alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-primary hover:underline">
-              Login
+              {t('login')}
             </Link>
           </p>
         </CardFooter>

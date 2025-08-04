@@ -9,6 +9,7 @@ import { Download } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/hooks/use-language';
 
 const WhatsAppIcon = () => (
   <svg
@@ -28,6 +29,7 @@ const WhatsAppIcon = () => (
 );
 
 export default function ProgressPage() {
+  const { t } = useLanguage();
   const progressRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -36,15 +38,15 @@ export default function ProgressPage() {
     if (!input) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: 'Could not find the content to download.',
+        title: t('errorOccurred'),
+        description: t('errorDownloading'),
       });
       return;
     }
 
     toast({
-      title: 'Generating PDF...',
-      description: 'Your progress report will be downloaded shortly.',
+      title: t('generatingPdf'),
+      description: t('generatingPdfDesc'),
     });
 
     html2canvas(input, {
@@ -78,16 +80,16 @@ export default function ProgressPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Your Progress"
+        title={t('yourProgress')}
         actions={
           <div className="flex items-center gap-2">
             <Button onClick={handleShareWhatsApp} variant="outline" size="sm">
               <WhatsAppIcon />
-              Share
+              {t('share')}
             </Button>
             <Button onClick={handleDownloadPdf} variant="outline" size="sm">
               <Download className="mr-2 h-4 w-4" />
-              Download PDF
+              {t('downloadPdf')}
             </Button>
           </div>
         }

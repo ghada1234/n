@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -14,9 +15,11 @@ import { Label } from '@/components/ui/label';
 import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/hooks/use-language';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,30 +31,30 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle>Welcome Back!</CardTitle>
+        <CardTitle>{t('welcomeBack')}</CardTitle>
         <CardDescription>
-          Sign in to continue to your dashboard.
+          {t('signInToContinue')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('emailLabel')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="alex.doe@example.com"
+              placeholder={t('emailPlaceholder')}
               required
             />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('passwordLabel')}</Label>
               <Link
                 href="/reset-password"
                 className="text-sm text-primary hover:underline"
               >
-                Forgot password?
+                {t('forgotPassword')}
               </Link>
             </div>
             <Input id="password" type="password" required />
@@ -59,12 +62,12 @@ export default function LoginPage() {
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full">
-            <LogIn className="mr-2" /> Login
+            <LogIn className="mr-2" /> {t('login')}
           </Button>
           <p className="text-sm text-muted-foreground">
-            {"Don't have an account?"}{' '}
+            {t('dontHaveAccount')}{' '}
             <Link href="/signup" className="text-primary hover:underline">
-              Sign Up
+              {t('signUp')}
             </Link>
           </p>
         </CardFooter>

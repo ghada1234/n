@@ -21,6 +21,7 @@ import {
   } from "@/components/ui/select"
 import type { ExerciseLogEntry } from './log-tabs';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface AddExerciseDialogProps {
   isOpen: boolean;
@@ -31,6 +32,7 @@ interface AddExerciseDialogProps {
 }
 
 export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise, onEditExercise, exerciseToEdit }: AddExerciseDialogProps) {
+    const { t } = useLanguage();
     const [type, setType] = useState('');
     const [details, setDetails] = useState('');
     const [caloriesBurned, setCaloriesBurned] = useState('');
@@ -64,43 +66,43 @@ export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise,
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{exerciseToEdit ? 'Edit Exercise' : 'Add Exercise'}</DialogTitle>
+          <DialogTitle>{exerciseToEdit ? t('editExerciseTitle') : t('addExerciseTitle')}</DialogTitle>
           <DialogDescription>
-            {exerciseToEdit ? 'Update the details of your exercise.' : 'Log a new exercise to your daily journal.'}
+            {exerciseToEdit ? t('editExerciseDesc') : t('addExerciseDesc')}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="type" className="text-right">
-              Type
+              {t('exerciseType')}
             </Label>
             <Select onValueChange={setType} value={type}>
                 <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Select a type" />
+                    <SelectValue placeholder={t('selectType')} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="Cardio">Cardio</SelectItem>
-                    <SelectItem value="Strength">Strength</SelectItem>
-                    <SelectItem value="Flexibility">Flexibility</SelectItem>
-                    <SelectItem value="Other">Other</SelectItem>
+                    <SelectItem value="Cardio">{t('cardio')}</SelectItem>
+                    <SelectItem value="Strength">{t('strength')}</SelectItem>
+                    <SelectItem value="Flexibility">{t('flexibility')}</SelectItem>
+                    <SelectItem value="Other">{t('other')}</SelectItem>
                 </SelectContent>
             </Select>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="details" className="text-right">
-              Details
+              {t('exerciseDetails')}
             </Label>
-            <Input id="details" value={details} onChange={(e) => setDetails(e.target.value)} placeholder="e.g., Running - 30 min" className="col-span-3" />
+            <Input id="details" value={details} onChange={(e) => setDetails(e.target.value)} placeholder={t('exerciseDetailsPlaceholder')} className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="caloriesBurned" className="text-right">
-              Calories Burned
+              {t('caloriesBurnedLabel')}
             </Label>
-            <Input id="caloriesBurned" type="number" value={caloriesBurned} onChange={(e) => setCaloriesBurned(e.target.value)} placeholder="e.g., 300" className="col-span-3" />
+            <Input id="caloriesBurned" type="number" value={caloriesBurned} onChange={(e) => setCaloriesBurned(e.target.value)} placeholder={t('caloriesBurnedPlaceholder')} className="col-span-3" />
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>{exerciseToEdit ? 'Save Changes' : 'Add to Log'}</Button>
+          <Button onClick={handleSubmit}>{exerciseToEdit ? t('saveChanges') : t('addToLog')}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

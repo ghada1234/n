@@ -1,38 +1,41 @@
+
+'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import Image from 'next/image';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Utensils, Sparkles, BarChart, Bell, UserCircle } from 'lucide-react';
-
-const features = [
-    {
-        icon: UserCircle,
-        title: 'User Profile',
-        description: 'Create and manage your personal profile to tailor your nutrition plan.'
-    },
-    {
-        icon: Utensils,
-        title: 'Food and Exercise Log',
-        description: 'Easily log your daily meals and workouts with our intuitive search and entry tools.'
-    },
-    {
-        icon: Sparkles,
-        title: 'AI Meal Suggestions',
-        description: 'Get intelligent, healthy meal ideas based on your preferences and dietary needs.'
-    },
-    {
-        icon: BarChart,
-        title: 'Progress Visualization',
-        description: 'Track your journey with beautiful charts that visualize your progress towards your goals.'
-    },
-     {
-        icon: Bell,
-        title: 'Push Notifications',
-        description: 'Stay on track with friendly reminders to log your meals and exercise.'
-    },
-]
+import { useLanguage } from '@/hooks/use-language';
 
 export default function HomePage() {
+  const { t } = useLanguage();
+  const features = [
+      {
+          icon: UserCircle,
+          title: t('featureUserProfileTitle'),
+          description: t('featureUserProfileDescription')
+      },
+      {
+          icon: Utensils,
+          title: t('featureFoodLogTitle'),
+          description: t('featureFoodLogDescription')
+      },
+      {
+          icon: Sparkles,
+          title: t('featureAISuggestionsTitle'),
+          description: t('featureAISuggestionsDescription')
+      },
+      {
+          icon: BarChart,
+          title: t('featureProgressTitle'),
+          description: t('featureProgressDescription')
+      },
+       {
+          icon: Bell,
+          title: t('featureNotificationsTitle'),
+          description: t('featureNotificationsDescription')
+      },
+  ]
+
   return (
     <>
     <section className="w-full py-12 md:py-24 lg:py-32 bg-secondary/50">
@@ -41,21 +44,21 @@ export default function HomePage() {
                 <div className="flex flex-col justify-center space-y-4">
                     <div className="space-y-2">
                         <h1 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
-                            Navigate Your Nutrition Journey
+                            {t('homeTitle')}
                         </h1>
                         <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                            Nutrition Navigator is your ultimate companion for achieving your health and fitness goals. Log meals, track progress, and get AI-powered suggestions tailored just for you.
+                            {t('homeDescription')}
                         </p>
                     </div>
                     <div className="flex flex-col gap-2 min-[400px]:flex-row">
                         <Button asChild size="lg">
                             <Link href="/signup">
-                                Get Started
+                                {t('getStarted')}
                             </Link>
                         </Button>
                          <Button asChild size="lg" variant="outline">
                             <Link href="/about">
-                                Learn More
+                                {t('learnMore')}
                             </Link>
                         </Button>
                     </div>
@@ -67,10 +70,10 @@ export default function HomePage() {
         <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
                 <div className="space-y-2">
-                    <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Key Features</div>
-                    <h2 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl">Everything You Need to Succeed</h2>
+                    <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">{t('keyFeatures')}</div>
+                    <h2 className="text-3xl font-headline font-bold tracking-tighter sm:text-5xl">{t('featuresTitle')}</h2>
                     <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                        Our app is packed with features designed to make tracking your nutrition simple, effective, and enjoyable.
+                        {t('featuresDescription')}
                     </p>
                 </div>
             </div>

@@ -18,10 +18,12 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { auth } from '@/lib/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
+import { useLanguage } from '@/hooks/use-language';
 
 
 export default function ResetPasswordPage() {
     const { toast } = useToast();
+    const { t } = useLanguage();
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSent, setIsSent] = useState(false);
@@ -34,14 +36,14 @@ export default function ResetPasswordPage() {
         try {
             await sendPasswordResetEmail(auth, email);
             toast({
-                title: "Password Reset Link Sent",
-                description: "If an account with that email exists, a reset link has been sent.",
+                title: t('passwordResetSent'),
+                description: t('passwordResetSentDesc'),
             });
             setIsSent(true);
         } catch (error: any) {
              toast({
                 variant: "destructive",
-                title: "Uh oh! Something went wrong.",
+                title: t('errorOccurred'),
                 description: error.message,
             })
         } finally {
@@ -51,19 +53,19 @@ export default function ResetPasswordPage() {
   return (
     <Card>
       <CardHeader className="text-center">
-        <CardTitle>Reset Your Password</CardTitle>
+        <CardTitle>{t('resetYourPassword')}</CardTitle>
         <CardDescription>
-          Enter your email to receive a password reset link.
+          {t('resetPasswordDescription')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleReset}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('emailLabel')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="alex.doe@example.com"
+              placeholder={t('emailPlaceholder')}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -74,10 +76,10 @@ export default function ResetPasswordPage() {
         <CardFooter className="flex flex-col gap-4">
           <Button type="submit" className="w-full" disabled={isLoading || isSent}>
             {isLoading ? <Loader2 className="mr-2 animate-spin" /> : <KeyRound className="mr-2" />} 
-            {isSent ? 'Link Sent!' : 'Send Reset Link'}
+            {isSent ? t('linkSent') : t('sendResetLink')}
           </Button>
           <Link href="/login" className="text-sm text-primary hover:underline">
-            Back to Login
+            {t('backToLogin')}
           </Link>
         </CardFooter>
       </form>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart } from 'recharts';
 import type { ChartConfig } from '@/components/ui/chart';
+import { useLanguage } from '@/hooks/use-language';
 
 const weightData = [
   { date: 'Jan 1', weight: 186 },
@@ -36,27 +38,29 @@ const calorieData = [
   { day: 'Sun', calories: 2200 },
 ];
 
-const weightChartConfig = {
-  weight: {
-    label: 'Weight (lbs)',
-    color: 'hsl(var(--primary))',
-  },
-} satisfies ChartConfig;
-
-const calorieChartConfig = {
-  calories: {
-    label: 'Calories',
-    color: 'hsl(var(--accent))',
-  },
-} satisfies ChartConfig;
-
 const ProgressCharts = () => {
+    const { t } = useLanguage();
+    
+    const weightChartConfig = {
+      weight: {
+        label: t('weightLabel'),
+        color: 'hsl(var(--primary))',
+      },
+    } satisfies ChartConfig;
+    
+    const calorieChartConfig = {
+      calories: {
+        label: t('calories'),
+        color: 'hsl(var(--accent))',
+      },
+    } satisfies ChartConfig;
+
   return (
     <div className="grid gap-8 md:grid-cols-1 lg:grid-cols-2">
       <Card>
         <CardHeader>
-          <CardTitle>Weight Over Time</CardTitle>
-          <CardDescription>Your weight progress over the last few weeks.</CardDescription>
+          <CardTitle>{t('weightOverTime')}</CardTitle>
+          <CardDescription>{t('weightProgressDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartContainer config={weightChartConfig} className="h-[300px] w-full">
@@ -72,8 +76,8 @@ const ProgressCharts = () => {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>Weekly Calorie Intake</CardTitle>
-          <CardDescription>Your calorie intake for the past week.</CardDescription>
+          <CardTitle>{t('weeklyCalorieIntake')}</CardTitle>
+          <CardDescription>{t('weeklyCalorieIntakeDesc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <ChartContainer config={calorieChartConfig} className="h-[300px] w-full">

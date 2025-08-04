@@ -28,15 +28,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { useLanguage } from '@/hooks/use-language';
 
 const AppSidebar = () => {
   const pathname = usePathname();
+  const { t, setLanguage } = useLanguage();
 
   const menuItems = [
-    { href: '/dashboard', label: 'Dashboard', icon: LayoutGrid },
-    { href: '/progress', label: 'Progress', icon: LineChart },
-    { href: '/ai-suggestions', label: 'AI Suggestions', icon: Sparkles },
-    { href: '/profile', label: 'Profile', icon: User },
+    { href: '/dashboard', label: t('dashboard'), icon: LayoutGrid },
+    { href: '/progress', label: t('progress'), icon: LineChart },
+    { href: '/ai-suggestions', label: t('aiSuggestions'), icon: Sparkles },
+    { href: '/profile', label: t('profile'), icon: User },
   ];
 
   return (
@@ -45,7 +47,7 @@ const AppSidebar = () => {
         <div className="flex items-center gap-2">
           <Utensils className="w-8 h-8 text-primary" />
           <h2 className="text-2xl font-headline font-bold text-foreground">
-            Nutrition Navigator
+            {t('appName')}
           </h2>
         </div>
       </SidebarHeader>
@@ -72,21 +74,21 @@ const AppSidebar = () => {
             <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="justify-start gap-2">
                     <Languages className="w-5 h-5" />
-                    <span>Language</span>
+                    <span>{t('language')}</span>
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="right" align="start">
-                <DropdownMenuItem>
-                    English
+                <DropdownMenuItem onClick={() => setLanguage('en')}>
+                    {t('english')}
                 </DropdownMenuItem>
-                <DropdownMenuItem>
-                    Arabic
+                <DropdownMenuItem onClick={() => setLanguage('ar')}>
+                    {t('arabic')}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
         <Button variant="ghost" className="justify-start gap-2">
           <Settings className="w-5 h-5" />
-          <span>Settings</span>
+          <span>{t('settings')}</span>
         </Button>
       </SidebarFooter>
     </Sidebar>

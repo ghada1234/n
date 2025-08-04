@@ -37,6 +37,7 @@ import { Input } from '../ui/input';
 import AddFoodDialog from './add-food-dialog';
 import AddExerciseDialog from './add-exercise-dialog';
 import SummaryCards from './summary-cards';
+import { useLanguage } from '@/hooks/use-language';
 
 export interface FoodLogEntry {
   id: number;
@@ -71,6 +72,7 @@ const initialExerciseLog: ExerciseLogEntry[] = [
 ];
 
 const LogTabs = () => {
+    const { t } = useLanguage();
     const [foodLog, setFoodLog] = useState<FoodLogEntry[]>(initialFoodLog);
     const [exerciseLog, setExerciseLog] = useState<ExerciseLogEntry[]>(initialExerciseLog);
     
@@ -166,14 +168,14 @@ const LogTabs = () => {
     <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
       <div className="flex items-center justify-between">
         <TabsList>
-          <TabsTrigger value="food">Food Log</TabsTrigger>
-          <TabsTrigger value="exercise">Exercise Log</TabsTrigger>
+          <TabsTrigger value="food">{t('foodLog')}</TabsTrigger>
+          <TabsTrigger value="exercise">{t('exerciseLog')}</TabsTrigger>
         </TabsList>
         <div className="relative ml-auto flex-1 md:grow-0">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search..."
+            placeholder={`${t('searchPlaceholder')}...`}
             className="w-full rounded-lg bg-card pl-8 md:w-[200px] lg:w-[320px]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -183,24 +185,24 @@ const LogTabs = () => {
       <TabsContent value="food">
         <Card>
           <CardHeader>
-            <CardTitle>Today's Food</CardTitle>
+            <CardTitle>{t('todaysFood')}</CardTitle>
             <CardDescription>
-              A log of your daily food intake.
+              {t('todaysFoodDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Item</TableHead>
-                  <TableHead>Portion</TableHead>
-                  <TableHead className="text-right">Calories</TableHead>
-                  <TableHead className="text-right">Protein</TableHead>
-                  <TableHead className="text-right">Carbs</TableHead>
-                  <TableHead className="text-right">Fat</TableHead>
-                  <TableHead className="text-right">Sugar</TableHead>
-                  <TableHead className="text-right">Sodium</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('item')}</TableHead>
+                  <TableHead>{t('portion')}</TableHead>
+                  <TableHead className="text-right">{t('calories')}</TableHead>
+                  <TableHead className="text-right">{t('protein')}</TableHead>
+                  <TableHead className="text-right">{t('carbs')}</TableHead>
+                  <TableHead className="text-right">{t('fat')}</TableHead>
+                  <TableHead className="text-right">{t('sugar')}</TableHead>
+                  <TableHead className="text-right">{t('sodium')}</TableHead>
+                  <TableHead className="text-right">{t('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -226,16 +228,16 @@ const LogTabs = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                                 <DropdownMenuItem onClick={() => handleLogAgainFood(entry)}>
-                                    <Copy className="mr-2 h-4 w-4" /> Log Again
+                                    <Copy className="mr-2 h-4 w-4" /> {t('logAgain')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openEditFoodDialog(entry)}>
-                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                    <Pencil className="mr-2 h-4 w-4" /> {t('edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteFood(entry.id)}>
-                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                    <Trash2 className="mr-2 h-4 w-4" /> {t('delete')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -247,7 +249,7 @@ const LogTabs = () => {
           </CardContent>
           <CardFooter className="justify-end">
              <Button onClick={() => setAddFoodOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Food
+              <PlusCircle className="mr-2 h-4 w-4" /> {t('addFood')}
             </Button>
           </CardFooter>
         </Card>
@@ -255,17 +257,17 @@ const LogTabs = () => {
       <TabsContent value="exercise">
         <Card>
           <CardHeader>
-            <CardTitle>Today's Exercise</CardTitle>
-            <CardDescription>A log of your daily physical activity.</CardDescription>
+            <CardTitle>{t('todaysExercise')}</CardTitle>
+            <CardDescription>{t('todaysExerciseDesc')}</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Details</TableHead>
-                  <TableHead className="text-right">Calories Burned</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead>{t('type')}</TableHead>
+                  <TableHead>{t('details')}</TableHead>
+                  <TableHead className="text-right">{t('caloriesBurned')}</TableHead>
+                  <TableHead className="text-right">{t('actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -283,16 +285,16 @@ const LogTabs = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                                 <DropdownMenuItem onClick={() => handleLogAgainExercise(entry)}>
-                                    <Copy className="mr-2 h-4 w-4" /> Log Again
+                                    <Copy className="mr-2 h-4 w-4" /> {t('logAgain')}
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={() => openEditExerciseDialog(entry)}>
-                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                    <Pencil className="mr-2 h-4 w-4" /> {t('edit')}
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteExercise(entry.id)}>
-                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                    <Trash2 className="mr-2 h-4 w-4" /> {t('delete')}
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -304,7 +306,7 @@ const LogTabs = () => {
           </CardContent>
            <CardFooter className="justify-end">
              <Button onClick={() => setAddExerciseOpen(true)}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Exercise
+              <PlusCircle className="mr-2 h-4 w-4" /> {t('addExercise')}
             </Button>
           </CardFooter>
         </Card>

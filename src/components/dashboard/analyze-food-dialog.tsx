@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/tabs';
 import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
+import { useLanguage } from '@/hooks/use-language';
 
 type AnalysisResult = (FoodAnalysisOutput | FoodAnalysisTextOutput | BarcodeLookupOutput) & { dishName?: string, productName?: string };
 
@@ -44,6 +45,7 @@ export default function AnalyzeFoodDialog({
   onOpenChange,
   onAnalysisComplete,
 }: AnalyzeFoodDialogProps) {
+  const { t } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -83,8 +85,8 @@ export default function AnalyzeFoodDialog({
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings.',
+          title: t('cameraAccessRequired'),
+          description: t('cameraAccessDescription'),
         });
       }
     };
@@ -100,7 +102,7 @@ export default function AnalyzeFoodDialog({
             clearInterval(detectionInterval.current);
         }
     }
-  }, [isOpen, facingMode, toast, requiresCamera]);
+  }, [isOpen, facingMode, toast, requiresCamera, t]);
   
   const handleBarcodeLookup = useCallback(async (barcodeValue: string) => {
     setIsLoading(true);
@@ -109,8 +111,8 @@ export default function AnalyzeFoodDialog({
         if (result.notFound || !result.productName) {
             toast({
               variant: 'destructive',
-              title: 'Product Not Found',
-              description: `Could not find a product with barcode: ${barcodeValue}`,
+              title: t('productNotFound'),
+              description: t('productNotFoundDesc', { barcode: barcodeValue }),
             });
         } else {
             onAnalysisComplete(result);
@@ -120,13 +122,13 @@ export default function AnalyzeFoodDialog({
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
         toast({
             variant: 'destructive',
-            title: 'Analysis Failed',
+            title: t('analysisFailed'),
             description: errorMessage,
         });
     } finally {
         setIsLoading(false);
     }
-  }, [onAnalysisComplete, toast]);
+  }, [onAnalysisComplete, toast, t]);
 
   const startBarcodeDetection = useCallback(() => {
     if (!isBarcodeSupported || !videoRef.current) return;
@@ -191,7 +193,7 @@ export default function AnalyzeFoodDialog({
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
         variant: 'destructive',
-        title: 'Analysis Failed',
+        title: t('analysisFailed'),
         description: errorMessage,
       });
     } finally {
@@ -212,7 +214,7 @@ export default function AnalyzeFoodDialog({
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
         toast({
             variant: 'destructive',
-            title: 'Analysis Failed',
+            title: t('analysisFailed'),
             description: errorMessage,
         });
     } finally {
@@ -229,17 +231,17 @@ export default function AnalyzeFoodDialog({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Analyze Food</DialogTitle>
+          <DialogTitle>{t('analyzeFood')}</DialogTitle>
           <DialogDescription>
-            Use your camera to identify a dish or scan a barcode.
+            {t('analyzeFoodDesc')}
           </DialogDescription>
         </DialogHeader>
         
         <Tabs value={analysisMode} onValueChange={(value) => setAnalysisMode(value as 'photo' | 'barcode' | 'text')} className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="photo">Photo</TabsTrigger>
-                <TabsTrigger value="barcode" disabled={!isBarcodeSupported}>Barcode</TabsTrigger>
-                <TabsTrigger value="text">Text</TabsTrigger>
+                <TabsTrigger value="photo">{t('photo')}</TabsTrigger>
+                <TabsTrigger value="barcode" disabled={!isBarcodeSupported}>{t('barcode')}</TabsTrigger>
+                <TabsTrigger value="text">{t('text')}</TabsTrigger>
             </TabsList>
             <TabsContent value="photo">
                 <div className="relative mt-2">
@@ -247,7 +249,7 @@ export default function AnalyzeFoodDialog({
                    {isLoading && (
                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
                       <Loader2 className="h-8 w-8 animate-spin text-white" />
-                      <p className="text-white mt-2">Analyzing Photo...</p>
+                      <p className="text-white mt-2">{t('analyzingPhoto')}</p>
                     </div>
                   )}
                 </div>
@@ -258,7 +260,7 @@ export default function AnalyzeFoodDialog({
                   {isLoading && (
                      <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
                       <Loader2 className="h-8 w-8 animate-spin text-white" />
-                       <p className="text-white mt-2">Looking up barcode...</p>
+                       <p className="text-white mt-2">{t('lookingUpBarcode')}</p>
                      </div>
                    )}
                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -268,10 +270,10 @@ export default function AnalyzeFoodDialog({
             </TabsContent>
             <TabsContent value="text">
                 <div className="space-y-2 mt-2">
-                    <Label htmlFor="text-description">Describe your meal</Label>
+                    <Label htmlFor="text-description">{t('describeMeal')}</Label>
                     <Textarea
                         id="text-description"
-                        placeholder="e.g., A bowl of oatmeal with berries and nuts"
+                        placeholder={t('describeMealPlaceholder')}
                         value={textDescription}
                         onChange={(e) => setTextDescription(e.target.value)}
                         disabled={isLoading}
@@ -280,7 +282,7 @@ export default function AnalyzeFoodDialog({
                  {isLoading && analysisMode === 'text' && (
                     <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center rounded-md">
                         <Loader2 className="h-8 w-8 animate-spin text-white" />
-                        <p className="text-white mt-2">Analyzing Text...</p>
+                        <p className="text-white mt-2">{t('analyzingText')}</p>
                     </div>
                 )}
             </TabsContent>
@@ -288,9 +290,9 @@ export default function AnalyzeFoodDialog({
 
         {hasCameraPermission === false && requiresCamera && (
           <Alert variant="destructive">
-            <AlertTitle>Camera Access Required</AlertTitle>
+            <AlertTitle>{t('cameraAccessRequired')}</AlertTitle>
             <AlertDescription>
-              Please allow camera access in your browser to use this feature.
+              {t('cameraAccessDescription')}
             </AlertDescription>
           </Alert>
         )}
@@ -299,26 +301,26 @@ export default function AnalyzeFoodDialog({
             {requiresCamera && (
               <Button variant="outline" onClick={switchCamera} disabled={isLoading || !hasCameraPermission}>
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Switch Camera
+                  {t('switchCamera')}
               </Button>
             )}
 
             {analysisMode === 'photo' && (
                 <Button onClick={handleCaptureAndAnalyze} disabled={isLoading || !hasCameraPermission}>
                     <Camera className="mr-2 h-4 w-4" />
-                    Analyze Photo
+                    {t('analyzePhotoBtn')}
                 </Button>
             )}
             {analysisMode === 'barcode' && (
                  <Button onClick={() => {if(detectionInterval.current) clearInterval(detectionInterval.current); startBarcodeDetection()}} disabled={isLoading || !hasCameraPermission}>
                     <ScanBarcode className="mr-2 h-4 w-4" />
-                    Rescan
+                    {t('rescan')}
                 </Button>
             )}
              {analysisMode === 'text' && (
                 <Button onClick={handleTextAnalyze} disabled={isLoading || !textDescription}>
                     <Type className="mr-2 h-4 w-4" />
-                    Analyze Text
+                    {t('analyzeTextBtn')}
                 </Button>
             )}
         </DialogFooter>
