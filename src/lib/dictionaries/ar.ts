@@ -49,7 +49,6 @@ export const ar = {
     emailLabel: 'البريد الإلكتروني',
     emailPlaceholder: 'alex.doe@example.com',
     passwordLabel: 'كلمة المرور',
-    forgotPassword: 'نسيت كلمة المرور؟',
     dontHaveAccount: 'ليس لديك حساب؟',
     signUp: 'إنشاء حساب',
     createAccount: 'إنشاء حساب جديد',
@@ -57,13 +56,6 @@ export const ar = {
     fullNameLabel: 'الاسم الكامل',
     fullNamePlaceholder: 'أليكس دو',
     alreadyHaveAccount: 'لديك حساب بالفعل؟',
-    resetYourPassword: 'إعادة تعيين كلمة المرور',
-    resetPasswordDescription: 'أدخل بريدك الإلكتروني لتلقي رابط إعادة تعيين كلمة المرور.',
-    sendResetLink: 'إرسال رابط إعادة التعيين',
-    linkSent: 'تم إرسال الرابط!',
-    backToLogin: 'العودة إلى تسجيل الدخول',
-    passwordResetSent: "تم إرسال رابط إعادة تعيين كلمة المرور",
-    passwordResetSentDesc: "إذا كان هناك حساب بهذا البريد الإلكتروني، فقد تم إرسال رابط إعادة التعيين.",
     errorOccurred: "عفوًا! حدث خطأ ما.",
 
     // App Layout
@@ -211,6 +203,15 @@ export const ar = {
     currentWeight: 'الوزن الحالي (كجم)',
     primaryGoal: 'الهدف الأساسي',
     primaryGoalPlaceholder: 'خسارة 5 كجم وبناء العضلات',
+    healthInsightsTitle: 'رؤى صحية',
+    healthInsightsDescription: 'احسب مؤشر كتلة الجسم واحصل على نصائح غذائية مخصصة من الذكاء الاصطناعي.',
+    calculateInsights: 'حساب الرؤى الصحية',
+    bmi: 'مؤشر كتلة الجسم',
+    healthyWeightRange: 'نطاق الوزن الصحي',
+    healthyWeightDescription: 'بناءً على مؤشر كتلة الجسم 18.5-24.9.',
+    macroTitle: 'أهداف المغذيات الكبرى المخصصة',
+    microTitle: 'توصيات المغذيات الدقيقة الرئيسية',
+
     
     // Toasts & Alerts
     formErrorNationality: 'لا يمكن أن تكون الجنسية فارغة.',

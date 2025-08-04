@@ -48,7 +48,6 @@ export const en = {
     emailLabel: 'Email',
     emailPlaceholder: 'alex.doe@example.com',
     passwordLabel: 'Password',
-    forgotPassword: 'Forgot password?',
     dontHaveAccount: "Don't have an account?",
     signUp: 'Sign Up',
     createAccount: 'Create an Account',
@@ -56,13 +55,6 @@ export const en = {
     fullNameLabel: 'Full Name',
     fullNamePlaceholder: 'Alex Doe',
     alreadyHaveAccount: 'Already have an account?',
-    resetYourPassword: 'Reset Your Password',
-    resetPasswordDescription: 'Enter your email to receive a password reset link.',
-    sendResetLink: 'Send Reset Link',
-    linkSent: 'Link Sent!',
-    backToLogin: 'Back to Login',
-    passwordResetSent: "Password Reset Link Sent",
-    passwordResetSentDesc: "If an account with that email exists, a reset link has been sent.",
     errorOccurred: "Uh oh! Something went wrong.",
 
     // App Layout
@@ -211,6 +203,15 @@ export const en = {
     currentWeight: 'Current Weight (kg)',
     primaryGoal: 'Primary Goal',
     primaryGoalPlaceholder: 'Lose 5kg and build muscle',
+    healthInsightsTitle: 'Health Insights',
+    healthInsightsDescription: 'Calculate your BMI and get personalized nutrient advice from our AI.',
+    calculateInsights: 'Calculate Health Insights',
+    bmi: 'BMI',
+    healthyWeightRange: 'Healthy Weight Range',
+    healthyWeightDescription: 'Based on a BMI of 18.5-24.9.',
+    macroTitle: 'Personalized Macronutrient Goals',
+    microTitle: 'Key Micronutrient Recommendations',
+
     
     // Toasts & Alerts
     formErrorNationality: 'Nationality cannot be empty.',
