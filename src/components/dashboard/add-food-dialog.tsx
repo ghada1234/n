@@ -67,6 +67,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
                     <SelectItem value="Lunch">Lunch</SelectItem>
                     <SelectItem value="Dinner">Dinner</SelectItem>
                     <SelectItem value="Snacks">Snacks</SelectItem>
+                    <SelectItem value="Dessert">Dessert</SelectItem>
                 </SelectContent>
             </Select>
           </div>
