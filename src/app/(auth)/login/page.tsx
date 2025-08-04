@@ -48,15 +48,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">{t('passwordLabel')}</Label>
-              <Link
-                href="/reset-password"
-                className="text-sm text-primary hover:underline"
-              >
-                {t('forgotPassword')}
-              </Link>
-            </div>
+            <Label htmlFor="password">{t('passwordLabel')}</Label>
             <Input id="password" type="password" required />
           </div>
         </CardContent>
