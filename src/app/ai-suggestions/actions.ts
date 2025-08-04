@@ -6,8 +6,20 @@ import { z } from 'zod';
 import { en } from '@/lib/dictionaries/en';
 import { ar } from '@/lib/dictionaries/ar';
 
-// This is a server action, so we can't use the hook. We'll get the language from the form data.
-const getTranslations = (lang: 'en' | 'ar') => (lang === 'ar' ? ar : en);
+const dictionaries = { en, ar };
+
+const getTranslator = (lang: 'en' | 'ar' = 'en') => {
+    const dictionary = dictionaries[lang];
+    return (key: keyof typeof en, options?: { [key: string]: string | number }): string => {
+        let text = dictionary[key] || dictionaries['en'][key];
+        if (options) {
+            Object.keys(options).forEach(k => {
+                text = text.replace(new RegExp(`{{${k}}}`, 'g'), String(options[k]));
+            });
+        }
+        return text;
+    };
+};
 
 export async function generateMealSuggestion(
   prevState: any,
@@ -18,7 +30,7 @@ export async function generateMealSuggestion(
     data: MealSuggestionOutput | null;
 }> {
   const lang = (formData.get('language') || 'en') as 'en' | 'ar';
-  const t = getTranslations(lang);
+  const t = getTranslator(lang);
 
   const MealSuggestionInputSchema = z.object({
     nationality: z.string().min(1, { message: t('formErrorNationality') }),
