@@ -72,7 +72,8 @@ const LogTabs = () => {
     }
 
     const filteredFoodLog = foodLog.filter(entry =>
-        entry.item.toLowerCase().includes(searchTerm.toLowerCase())
+        entry.item.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.meal.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const filteredExerciseLog = exerciseLog.filter(entry =>
