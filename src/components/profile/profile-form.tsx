@@ -45,6 +45,10 @@ const ProfileForm = () => {
           <Input id="age" type="number" defaultValue="32" />
         </div>
         <div className="space-y-2">
+          <Label htmlFor="nationality">Nationality</Label>
+          <Input id="nationality" defaultValue="American" />
+        </div>
+        <div className="space-y-2">
           <Label htmlFor="height">Height (cm)</Label>
           <Input id="height" type="number" defaultValue="175" />
         </div>
