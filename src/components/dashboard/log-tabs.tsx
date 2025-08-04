@@ -1,4 +1,6 @@
+
 'use client';
+import { useState } from 'react';
 import {
   Tabs,
   TabsContent,
@@ -24,12 +26,20 @@ import {
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Search } from 'lucide-react';
 import { Input } from '../ui/input';
+import AddFoodDialog from './add-food-dialog';
 
-const foodLog = [
-  { meal: 'Breakfast', item: 'Oatmeal with Berries', calories: 350 },
-  { meal: 'Lunch', item: 'Grilled Chicken Salad', calories: 450 },
-  { meal: 'Dinner', item: 'Salmon with Quinoa', calories: 550 },
-  { meal: 'Snacks', item: 'Apple and Peanut Butter', calories: 230 },
+export interface FoodLogEntry {
+  id: number;
+  meal: string;
+  item: string;
+  calories: number;
+}
+
+const initialFoodLog: FoodLogEntry[] = [
+  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', calories: 350 },
+  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', calories: 450 },
+  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', calories: 550 },
+  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', calories: 230 },
 ];
 
 const exerciseLog = [
@@ -38,7 +48,15 @@ const exerciseLog = [
 ];
 
 const LogTabs = () => {
+    const [foodLog, setFoodLog] = useState<FoodLogEntry[]>(initialFoodLog);
+    const [isAddFoodOpen, setAddFoodOpen] = useState(false);
+
+    const handleAddFood = (newFood: Omit<FoodLogEntry, 'id'>) => {
+        setFoodLog(prevLog => [...prevLog, { ...newFood, id: prevLog.length + 1 }]);
+    }
+
   return (
+    <>
     <Tabs defaultValue="food">
       <div className="flex items-center justify-between">
         <TabsList>
@@ -72,8 +90,8 @@ const LogTabs = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {foodLog.map((entry, index) => (
-                  <TableRow key={index}>
+                {foodLog.map((entry) => (
+                  <TableRow key={entry.id}>
                     <TableCell className="font-medium">{entry.meal}</TableCell>
                     <TableCell>{entry.item}</TableCell>
                     <TableCell className="text-right">{entry.calories}</TableCell>
@@ -83,7 +101,7 @@ const LogTabs = () => {
             </Table>
           </CardContent>
           <CardFooter className="justify-end">
-             <Button>
+             <Button onClick={() => setAddFoodOpen(true)}>
               <PlusCircle className="mr-2 h-4 w-4" /> Add Food
             </Button>
           </CardFooter>
@@ -123,6 +141,8 @@ const LogTabs = () => {
         </Card>
       </TabsContent>
     </Tabs>
+    <AddFoodDialog isOpen={isAddFoodOpen} onOpenChange={setAddFoodOpen} onAddFood={handleAddFood} />
+    </>
   );
 };
 
