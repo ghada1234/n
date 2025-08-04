@@ -14,11 +14,11 @@ import { ar } from '@/lib/dictionaries/ar';
 const getTranslations = (lang: 'en' | 'ar') => (lang === 'ar' ? ar : en);
 
 const NutrientAdviceActionSchema = z.object({
-    height: z.number({invalid_type_error: 'Height must be a number.'}).positive(),
-    weight: z.number({invalid_type_error: 'Weight must be a number.'}).positive(),
-    age: z.number({invalid_type_error: 'Age must be a number.'}).positive(),
-    goal: z.string().min(1, 'Goal cannot be empty.'),
-  });
+  height: z.coerce.number({invalid_type_error: 'Height must be a number.'}).positive('Height must be positive.'),
+  weight: z.coerce.number({invalid_type_error: 'Weight must be a number.'}).positive('Weight must be positive.'),
+  age: z.coerce.number({invalid_type_error: 'Age must be a number.'}).positive('Age must be positive.'),
+  goal: z.string().min(1, 'Goal cannot be empty.'),
+});
 
 
 export async function generateNutrientAdviceAction(
@@ -33,9 +33,9 @@ export async function generateNutrientAdviceAction(
   const t = getTranslations(lang);
 
   const validatedFields = NutrientAdviceActionSchema.safeParse({
-    height: Number(formData.get('height')),
-    weight: Number(formData.get('currentWeight')),
-    age: Number(formData.get('age')),
+    height: formData.get('height'),
+    weight: formData.get('currentWeight'),
+    age: formData.get('age'),
     goal: formData.get('goal'),
   });
 
