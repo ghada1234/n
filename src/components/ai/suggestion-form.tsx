@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useFormState, useFormStatus } from 'react-dom';
@@ -47,6 +48,23 @@ function SubmitButton() {
     </Button>
   );
 }
+
+const WhatsAppIcon = () => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="mr-2 h-4 w-4"
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+    </svg>
+  );
 
 const SuggestionForm = () => {
   const [state, formAction] = useFormState(generateMealSuggestion, initialState);
@@ -126,6 +144,25 @@ const SuggestionForm = () => {
             });
         });
     }, 500); // Wait for accordions to open
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!state.data || !state.data.mealSuggestions) return;
+
+    const { planTitle, mealSuggestions } = state.data;
+
+    let message = `Hey! 👋 Check out my meal plan from Nutrition Navigator:\n\n`;
+    message += `*${planTitle}* 🥗\n\n`;
+
+    mealSuggestions.forEach(meal => {
+        message += `*${meal.day ? `${meal.day}: ` : ''}${meal.mealName}* (~${meal.calories} kcal)\n`;
+        message += `_${meal.description}_\n\n`;
+    });
+    
+    message += "Generated with ❤️ by Nutrition Navigator!";
+
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
   };
 
 
@@ -219,10 +256,16 @@ const SuggestionForm = () => {
               </CardDescription>
             </div>
             {state.data && (
-                <Button onClick={handleDownloadPdf} variant="outline" size="sm" disabled={pending}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Download PDF
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button onClick={handleShareWhatsApp} variant="outline" size="sm" disabled={pending}>
+                        <WhatsAppIcon />
+                        Share
+                    </Button>
+                    <Button onClick={handleDownloadPdf} variant="outline" size="sm" disabled={pending}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PDF
+                    </Button>
+                </div>
             )}
         </CardHeader>
         <CardContent ref={suggestionsRef} className="flex-1 flex flex-col p-4">
