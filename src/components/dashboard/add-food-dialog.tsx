@@ -21,6 +21,8 @@ import {
   } from "@/components/ui/select"
 import type { FoodLogEntry } from './log-tabs';
 import { useState } from 'react';
+import { Sparkles } from 'lucide-react';
+import AnalyzeFoodDialog from './analyze-food-dialog';
 
 interface AddFoodDialogProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
     const [calories, setCalories] = useState('');
+    const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
     const handleSubmit = () => {
         if (meal && item && calories) {
@@ -44,7 +47,14 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
         }
     }
 
+    const handleAnalysisComplete = (analysis: { mealName: string, calories: number }) => {
+        setItem(analysis.mealName);
+        setCalories(String(analysis.calories));
+        setAnalyzeOpen(false);
+    }
+
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -84,10 +94,20 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
             <Input id="calories" type="number" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g., 95" className="col-span-3" />
           </div>
         </div>
-        <DialogFooter>
-          <Button onClick={handleSubmit}>Add to Log</Button>
+        <DialogFooter className="sm:justify-between">
+            <Button variant="outline" onClick={() => setAnalyzeOpen(true)}>
+                <Sparkles className="mr-2 h-4 w-4" />
+                Analyze with AI
+            </Button>
+            <Button onClick={handleSubmit}>Add to Log</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <AnalyzeFoodDialog 
+        isOpen={isAnalyzeOpen} 
+        onOpenChange={setAnalyzeOpen} 
+        onAnalysisComplete={handleAnalysisComplete}
+    />
+    </>
   );
 }
