@@ -42,11 +42,12 @@ export default function ResetPasswordPage() {
             });
             setIsSent(true);
         } catch (error: any) {
+             console.error("Password reset error:", error);
              const errorMessage = error.message || t('errorOccurred');
              toast({
                 variant: "destructive",
                 title: t('errorOccurred'),
-                description: errorMessage,
+                description: `Firebase error: ${error.code} - ${errorMessage}`,
             })
         } finally {
             setIsLoading(false);
