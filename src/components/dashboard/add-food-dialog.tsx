@@ -35,6 +35,7 @@ interface AddFoodDialogProps {
 export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditFood, foodToEdit }: AddFoodDialogProps) {
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
+    const [portionSize, setPortionSize] = useState('');
     const [calories, setCalories] = useState('');
     const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
@@ -42,29 +43,32 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
         if (foodToEdit) {
             setMeal(foodToEdit.meal);
             setItem(foodToEdit.item);
+            setPortionSize(foodToEdit.portionSize);
             setCalories(String(foodToEdit.calories));
         } else {
             // Reset form when dialog is opened for adding, or closed
             setMeal('');
             setItem('');
+            setPortionSize('');
             setCalories('');
         }
     }, [foodToEdit, isOpen]);
 
 
     const handleSubmit = () => {
-        if (meal && item && calories) {
+        if (meal && item && portionSize && calories) {
              if (foodToEdit) {
-                onEditFood({ ...foodToEdit, meal, item, calories: Number(calories) });
+                onEditFood({ ...foodToEdit, meal, item, portionSize, calories: Number(calories) });
             } else {
-                onAddFood({ meal, item, calories: Number(calories) });
+                onAddFood({ meal, item, portionSize, calories: Number(calories) });
             }
             onOpenChange(false);
         }
     }
     
-    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; }) => {
+    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; portionSize: string }) => {
         setItem(analysisResult.dishName);
+        setPortionSize(analysisResult.portionSize);
         setCalories(String(analysisResult.calories));
         setAnalyzeOpen(false);
     }, []);
@@ -103,6 +107,12 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditF
               Food
             </Label>
             <Input id="item" value={item} onChange={(e) => setItem(e.target.value)} placeholder="e.g., Apple" className="col-span-3" />
+          </div>
+           <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="portionSize" className="text-right">
+              Portion Size
+            </Label>
+            <Input id="portionSize" value={portionSize} onChange={(e) => setPortionSize(e.target.value)} placeholder="e.g., 1 cup" className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="calories" className="text-right">

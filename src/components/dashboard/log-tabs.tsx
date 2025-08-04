@@ -41,6 +41,7 @@ export interface FoodLogEntry {
   id: number;
   meal: string;
   item: string;
+  portionSize: string;
   calories: number;
 }
 
@@ -52,10 +53,10 @@ export interface ExerciseLogEntry {
 }
 
 const initialFoodLog: FoodLogEntry[] = [
-  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', calories: 350 },
-  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', calories: 450 },
-  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', calories: 550 },
-  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', calories: 230 },
+  { id: 1, meal: 'Breakfast', item: 'Oatmeal with Berries', portionSize: '1 cup', calories: 350 },
+  { id: 2, meal: 'Lunch', item: 'Grilled Chicken Salad', portionSize: '1 bowl', calories: 450 },
+  { id: 3, meal: 'Dinner', item: 'Salmon with Quinoa', portionSize: '1 filet', calories: 550 },
+  { id: 4, meal: 'Snacks', item: 'Apple and Peanut Butter', portionSize: '1 apple, 2 tbsp', calories: 230 },
 ];
 
 const initialExerciseLog: ExerciseLogEntry[] = [
@@ -87,7 +88,7 @@ const LogTabs = () => {
         setFoodLog(prevLog => prevLog.filter(entry => entry.id !== id));
     }
     const handleLogAgainFood = (foodEntry: FoodLogEntry) => {
-        handleAddFood({ meal: foodEntry.meal, item: foodEntry.item, calories: foodEntry.calories });
+        handleAddFood({ meal: foodEntry.meal, item: foodEntry.item, portionSize: foodEntry.portionSize, calories: foodEntry.calories });
     }
     const openEditFoodDialog = (foodEntry: FoodLogEntry) => {
         setEditingFood(foodEntry);
@@ -169,6 +170,7 @@ const LogTabs = () => {
                 <TableRow>
                   <TableHead>Meal</TableHead>
                   <TableHead>Item</TableHead>
+                  <TableHead>Portion</TableHead>
                   <TableHead className="text-right">Calories</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -178,6 +180,7 @@ const LogTabs = () => {
                   <TableRow key={entry.id}>
                     <TableCell className="font-medium">{entry.meal}</TableCell>
                     <TableCell>{entry.item}</TableCell>
+                    <TableCell>{entry.portionSize}</TableCell>
                     <TableCell className="text-right">{entry.calories}</TableCell>
                     <TableCell className="text-right">
                         <DropdownMenu>

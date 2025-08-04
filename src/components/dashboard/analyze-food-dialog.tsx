@@ -27,7 +27,7 @@ import {
 interface AnalyzeFoodDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  onAnalysisComplete: (result: { dishName: string; calories: number }) => void;
+  onAnalysisComplete: (result: { dishName: string; calories: number; portionSize: string; }) => void;
 }
 
 const isBarcodeDetectorSupported = () => {
@@ -111,6 +111,7 @@ export default function AnalyzeFoodDialog({
             onAnalysisComplete({
                 dishName: result.productName,
                 calories: result.calories ?? 0,
+                portionSize: "1 serving" // Default portion size for barcodes
             });
         }
     } catch (error) {
@@ -185,6 +186,7 @@ export default function AnalyzeFoodDialog({
         onAnalysisComplete({
           dishName: result.dishName,
           calories: result.calories,
+          portionSize: result.portionSize,
         });
       }
     } catch (error) {
