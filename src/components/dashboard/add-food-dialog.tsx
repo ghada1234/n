@@ -20,7 +20,9 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 import type { FoodLogEntry } from './log-tabs';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
+import { Camera } from 'lucide-react';
+import AnalyzeFoodDialog from './analyze-food-dialog';
 
 interface AddFoodDialogProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
     const [calories, setCalories] = useState('');
+    const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
     const handleSubmit = () => {
         if (meal && item && calories) {
@@ -43,8 +46,16 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
             setCalories('');
         }
     }
+    
+    const handleAnalysisComplete = useCallback((analysisResult: { dishName: string; calories: number; }) => {
+        setItem(analysisResult.dishName);
+        setCalories(String(analysisResult.calories));
+        setAnalyzeOpen(false);
+    }, []);
+
 
   return (
+    <>
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -83,11 +94,21 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
             </Label>
             <Input id="calories" type="number" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder="e.g., 95" className="col-span-3" />
           </div>
+          <Button variant="outline" onClick={() => setAnalyzeOpen(true)}>
+            <Camera className="mr-2 h-4 w-4" />
+            Analyze with AI
+          </Button>
         </div>
         <DialogFooter>
             <Button onClick={handleSubmit}>Add to Log</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <AnalyzeFoodDialog 
+        isOpen={isAnalyzeOpen} 
+        onOpenChange={setAnalyzeOpen} 
+        onAnalysisComplete={handleAnalysisComplete}
+    />
+    </>
   );
 }
