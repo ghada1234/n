@@ -16,8 +16,8 @@ import { Label } from '@/components/ui/label';
 import { KeyRound, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { auth } from '@/lib/firebase';
-import { sendPasswordResetEmail } from 'firebase/auth';
+import { getAuth, sendPasswordResetEmail } from 'firebase/auth';
+import { app } from '@/lib/firebase';
 import { useLanguage } from '@/hooks/use-language';
 
 
@@ -34,6 +34,7 @@ export default function ResetPasswordPage() {
         setIsSent(false);
 
         try {
+            const auth = getAuth(app);
             await sendPasswordResetEmail(auth, email);
             toast({
                 title: t('passwordResetSent'),
