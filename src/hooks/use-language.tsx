@@ -19,8 +19,10 @@ const dictionaries = { en, ar };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<Language>('en');
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const savedLanguage = localStorage.getItem('language') as Language;
     if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'ar')) {
         setLanguageState(savedLanguage);
@@ -29,19 +31,19 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('language', lang);
     if (typeof window !== 'undefined') {
+        localStorage.setItem('language', lang);
         document.documentElement.lang = lang;
         document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     }
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
+    if (isClient) {
         document.documentElement.lang = language;
         document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     }
-  }, [language]);
+  }, [language, isClient]);
 
 
   const t = (key: keyof typeof en, options?: { [key: string]: string | number }): string => {
