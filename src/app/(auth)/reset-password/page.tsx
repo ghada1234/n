@@ -41,10 +41,11 @@ export default function ResetPasswordPage() {
             });
             setIsSent(true);
         } catch (error: any) {
+             const errorMessage = error.message || t('errorOccurred');
              toast({
                 variant: "destructive",
                 title: t('errorOccurred'),
-                description: error.message,
+                description: errorMessage,
             })
         } finally {
             setIsLoading(false);
