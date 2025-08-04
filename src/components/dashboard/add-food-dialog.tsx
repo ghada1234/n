@@ -20,7 +20,7 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 import type { FoodLogEntry } from './log-tabs';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Camera } from 'lucide-react';
 import AnalyzeFoodDialog from './analyze-food-dialog';
 
@@ -28,22 +28,38 @@ interface AddFoodDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onAddFood: (food: Omit<FoodLogEntry, 'id'>) => void;
+  onEditFood: (food: FoodLogEntry) => void;
+  foodToEdit: FoodLogEntry | null;
 }
 
-export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFoodDialogProps) {
+export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood, onEditFood, foodToEdit }: AddFoodDialogProps) {
     const [meal, setMeal] = useState('');
     const [item, setItem] = useState('');
     const [calories, setCalories] = useState('');
     const [isAnalyzeOpen, setAnalyzeOpen] = useState(false);
 
-    const handleSubmit = () => {
-        if (meal && item && calories) {
-            onAddFood({ meal, item, calories: Number(calories) });
-            onOpenChange(false);
-            // Reset form
+    useEffect(() => {
+        if (foodToEdit) {
+            setMeal(foodToEdit.meal);
+            setItem(foodToEdit.item);
+            setCalories(String(foodToEdit.calories));
+        } else {
+            // Reset form when dialog is opened for adding, or closed
             setMeal('');
             setItem('');
             setCalories('');
+        }
+    }, [foodToEdit, isOpen]);
+
+
+    const handleSubmit = () => {
+        if (meal && item && calories) {
+             if (foodToEdit) {
+                onEditFood({ ...foodToEdit, meal, item, calories: Number(calories) });
+            } else {
+                onAddFood({ meal, item, calories: Number(calories) });
+            }
+            onOpenChange(false);
         }
     }
     
@@ -59,9 +75,9 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Food Item</DialogTitle>
+          <DialogTitle>{foodToEdit ? 'Edit Food Item' : 'Add Food Item'}</DialogTitle>
           <DialogDescription>
-            Log a new food item to your daily journal.
+             {foodToEdit ? 'Update the details of your food item.' : 'Log a new food item to your daily journal.'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -100,7 +116,7 @@ export default function AddFoodDialog({ isOpen, onOpenChange, onAddFood }: AddFo
           </Button>
         </div>
         <DialogFooter>
-            <Button onClick={handleSubmit}>Add to Log</Button>
+            <Button onClick={handleSubmit}>{foodToEdit ? 'Save Changes' : 'Add to Log'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

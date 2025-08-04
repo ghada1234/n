@@ -23,8 +23,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+  } from "@/components/ui/dropdown-menu"
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Search } from 'lucide-react';
+import { PlusCircle, Search, MoreHorizontal, Pencil, Trash2, Copy } from 'lucide-react';
 import { Input } from '../ui/input';
 import AddFoodDialog from './add-food-dialog';
 import AddExerciseDialog from './add-exercise-dialog';
@@ -58,17 +66,64 @@ const initialExerciseLog: ExerciseLogEntry[] = [
 const LogTabs = () => {
     const [foodLog, setFoodLog] = useState<FoodLogEntry[]>(initialFoodLog);
     const [exerciseLog, setExerciseLog] = useState<ExerciseLogEntry[]>(initialExerciseLog);
+    
     const [isAddFoodOpen, setAddFoodOpen] = useState(false);
     const [isAddExerciseOpen, setAddExerciseOpen] = useState(false);
+
+    const [editingFood, setEditingFood] = useState<FoodLogEntry | null>(null);
+    const [editingExercise, setEditingExercise] = useState<ExerciseLogEntry | null>(null);
+
     const [activeTab, setActiveTab] = useState('food');
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleAddFood = (newFood: Omit<FoodLogEntry, 'id'>) => {
-        setFoodLog(prevLog => [...prevLog, { ...newFood, id: prevLog.length + 1 }]);
+        setFoodLog(prevLog => [...prevLog, { ...newFood, id: Date.now() }]);
+    }
+     const handleEditFood = (updatedFood: FoodLogEntry) => {
+        setFoodLog(prevLog => prevLog.map(entry => entry.id === updatedFood.id ? updatedFood : entry));
+        setEditingFood(null);
+    }
+    const handleDeleteFood = (id: number) => {
+        setFoodLog(prevLog => prevLog.filter(entry => entry.id !== id));
+    }
+    const handleLogAgainFood = (foodEntry: FoodLogEntry) => {
+        handleAddFood({ meal: foodEntry.meal, item: foodEntry.item, calories: foodEntry.calories });
+    }
+    const openEditFoodDialog = (foodEntry: FoodLogEntry) => {
+        setEditingFood(foodEntry);
+        setAddFoodOpen(true);
     }
 
     const handleAddExercise = (newExercise: Omit<ExerciseLogEntry, 'id'>) => {
-        setExerciseLog(prevLog => [...prevLog, { ...newExercise, id: prevLog.length + 1 }]);
+        setExerciseLog(prevLog => [...prevLog, { ...newExercise, id: Date.now() }]);
+    }
+    const handleEditExercise = (updatedExercise: ExerciseLogEntry) => {
+        setExerciseLog(prevLog => prevLog.map(entry => entry.id === updatedExercise.id ? updatedExercise : entry));
+        setEditingExercise(null);
+    }
+    const handleDeleteExercise = (id: number) => {
+        setExerciseLog(prevLog => prevLog.filter(entry => entry.id !== id));
+    }
+    const handleLogAgainExercise = (exerciseEntry: ExerciseLogEntry) => {
+        handleAddExercise({ type: exerciseEntry.type, details: exerciseEntry.details, caloriesBurned: exerciseEntry.caloriesBurned });
+    }
+     const openEditExerciseDialog = (exerciseEntry: ExerciseLogEntry) => {
+        setEditingExercise(exerciseEntry);
+        setAddExerciseOpen(true);
+    }
+
+    // Reset editing state when dialogs are closed
+    const onFoodDialogChange = (isOpen: boolean) => {
+        if (!isOpen) {
+            setEditingFood(null);
+        }
+        setAddFoodOpen(isOpen);
+    }
+     const onExerciseDialogChange = (isOpen: boolean) => {
+        if (!isOpen) {
+            setEditingExercise(null);
+        }
+        setAddExerciseOpen(isOpen);
     }
 
     const filteredFoodLog = foodLog.filter(entry =>
@@ -77,7 +132,8 @@ const LogTabs = () => {
     );
 
     const filteredExerciseLog = exerciseLog.filter(entry =>
-        entry.details.toLowerCase().includes(searchTerm.toLowerCase())
+        entry.details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        entry.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
   return (
@@ -114,6 +170,7 @@ const LogTabs = () => {
                   <TableHead>Meal</TableHead>
                   <TableHead>Item</TableHead>
                   <TableHead className="text-right">Calories</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -122,6 +179,29 @@ const LogTabs = () => {
                     <TableCell className="font-medium">{entry.meal}</TableCell>
                     <TableCell>{entry.item}</TableCell>
                     <TableCell className="text-right">{entry.calories}</TableCell>
+                    <TableCell className="text-right">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleLogAgainFood(entry)}>
+                                    <Copy className="mr-2 h-4 w-4" /> Log Again
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openEditFoodDialog(entry)}>
+                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteFood(entry.id)}>
+                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -147,6 +227,7 @@ const LogTabs = () => {
                   <TableHead>Type</TableHead>
                   <TableHead>Details</TableHead>
                   <TableHead className="text-right">Calories Burned</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -155,6 +236,29 @@ const LogTabs = () => {
                     <TableCell className="font-medium">{entry.type}</TableCell>
                     <TableCell>{entry.details}</TableCell>
                     <TableCell className="text-right">{entry.caloriesBurned}</TableCell>
+                     <TableCell className="text-right">
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                <span className="sr-only">Open menu</span>
+                                <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleLogAgainExercise(entry)}>
+                                    <Copy className="mr-2 h-4 w-4" /> Log Again
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => openEditExerciseDialog(entry)}>
+                                    <Pencil className="mr-2 h-4 w-4" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteExercise(entry.id)}>
+                                    <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -168,8 +272,20 @@ const LogTabs = () => {
         </Card>
       </TabsContent>
     </Tabs>
-    <AddFoodDialog isOpen={isAddFoodOpen} onOpenChange={setAddFoodOpen} onAddFood={handleAddFood} />
-    <AddExerciseDialog isOpen={isAddExerciseOpen} onOpenChange={setAddExerciseOpen} onAddExercise={handleAddExercise} />
+    <AddFoodDialog 
+        isOpen={isAddFoodOpen} 
+        onOpenChange={onFoodDialogChange} 
+        onAddFood={handleAddFood}
+        onEditFood={handleEditFood}
+        foodToEdit={editingFood}
+    />
+    <AddExerciseDialog 
+        isOpen={isAddExerciseOpen} 
+        onOpenChange={onExerciseDialogChange} 
+        onAddExercise={handleAddExercise}
+        onEditExercise={handleEditExercise}
+        exerciseToEdit={editingExercise}
+    />
     </>
   );
 };

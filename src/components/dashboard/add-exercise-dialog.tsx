@@ -20,27 +20,43 @@ import {
     SelectValue,
   } from "@/components/ui/select"
 import type { ExerciseLogEntry } from './log-tabs';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface AddExerciseDialogProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   onAddExercise: (exercise: Omit<ExerciseLogEntry, 'id'>) => void;
+  onEditExercise: (exercise: ExerciseLogEntry) => void;
+  exerciseToEdit: ExerciseLogEntry | null;
 }
 
-export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise }: AddExerciseDialogProps) {
+export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise, onEditExercise, exerciseToEdit }: AddExerciseDialogProps) {
     const [type, setType] = useState('');
     const [details, setDetails] = useState('');
     const [caloriesBurned, setCaloriesBurned] = useState('');
 
-    const handleSubmit = () => {
-        if (type && details && caloriesBurned) {
-            onAddExercise({ type, details, caloriesBurned: Number(caloriesBurned) });
-            onOpenChange(false);
-            // Reset form
+    useEffect(() => {
+        if (exerciseToEdit) {
+            setType(exerciseToEdit.type);
+            setDetails(exerciseToEdit.details);
+            setCaloriesBurned(String(exerciseToEdit.caloriesBurned));
+        } else {
+            // Reset form when dialog is opened for adding, or closed
             setType('');
             setDetails('');
             setCaloriesBurned('');
+        }
+    }, [exerciseToEdit, isOpen]);
+
+
+    const handleSubmit = () => {
+        if (type && details && caloriesBurned) {
+            if (exerciseToEdit) {
+                onEditExercise({ ...exerciseToEdit, type, details, caloriesBurned: Number(caloriesBurned) });
+            } else {
+                onAddExercise({ type, details, caloriesBurned: Number(caloriesBurned) });
+            }
+            onOpenChange(false);
         }
     }
 
@@ -48,9 +64,9 @@ export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise 
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add Exercise</DialogTitle>
+          <DialogTitle>{exerciseToEdit ? 'Edit Exercise' : 'Add Exercise'}</DialogTitle>
           <DialogDescription>
-            Log a new exercise to your daily journal.
+            {exerciseToEdit ? 'Update the details of your exercise.' : 'Log a new exercise to your daily journal.'}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -84,7 +100,7 @@ export default function AddExerciseDialog({ isOpen, onOpenChange, onAddExercise 
           </div>
         </div>
         <DialogFooter>
-          <Button onClick={handleSubmit}>Add to Log</Button>
+          <Button onClick={handleSubmit}>{exerciseToEdit ? 'Save Changes' : 'Add to Log'}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
