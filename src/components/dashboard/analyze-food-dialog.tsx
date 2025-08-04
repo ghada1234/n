@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -11,13 +11,14 @@ import {
   DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Camera, Loader2, Send, SwitchCamera, AlertTriangle } from 'lucide-react';
+import { Camera, Loader2, Send, SwitchCamera, AlertTriangle, ScanBarcode } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { analyzeMealAction } from '@/app/(app)/meal-analyzer/actions';
-import type { MealAnalyzerOutput } from '@/ai/flows/meal-analyzer';
+import { lookupBarcode } from '@/ai/flows/barcode-lookup';
 
 type FacingMode = 'user' | 'environment';
+type AnalysisMode = 'photo' | 'barcode';
 
 interface AnalyzeFoodDialogProps {
   isOpen: boolean;
@@ -29,16 +30,27 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(
-    null
-  );
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [facingMode, setFacingMode] = useState<FacingMode>('environment');
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('photo');
+  const [barcodeDetector, setBarcodeDetector] = useState<any>(null); // Use 'any' for experimental API
+  const detectionInterval = useRef<NodeJS.Timeout | null>(null);
+  const [isBarcodeSupported, setIsBarcodeSupported] = useState(false);
+
+  useEffect(() => {
+    setIsBarcodeSupported(typeof window !== 'undefined' && 'BarcodeDetector' in window);
+  }, []);
 
   const resetState = () => {
     setCapturedImage(null);
     setIsLoading(false);
+    setAnalysisMode('photo');
+    if (detectionInterval.current) {
+        clearInterval(detectionInterval.current);
+        detectionInterval.current = null;
+    }
   }
 
   const handleOpenChange = (open: boolean) => {
@@ -48,8 +60,62 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
     onOpenChange(open);
   }
 
+  const handleBarcodeLookup = useCallback(async (barcodeValue: string) => {
+    if (detectionInterval.current) {
+        clearInterval(detectionInterval.current);
+        detectionInterval.current = null;
+    }
+    setIsLoading(true);
+    toast({
+        title: "Barcode Detected!",
+        description: `Looking up ${barcodeValue}...`
+    });
+
+    try {
+        const result = await lookupBarcode({ barcode: barcodeValue });
+        if (result) {
+            onAnalysisComplete({ mealName: result.productName, calories: result.calories });
+        } else {
+            throw new Error("Product not found.");
+        }
+    } catch (error) {
+        console.error(error);
+        toast({
+            variant: 'destructive',
+            title: 'Barcode Lookup Failed',
+            description: "Could not find a product for this barcode.",
+        });
+        // Restart detection if lookup fails
+        startBarcodeDetection();
+    } finally {
+        setIsLoading(false);
+    }
+  }, [onAnalysisComplete, toast]);
+
+  const startBarcodeDetection = useCallback(() => {
+    if (!barcodeDetector || !videoRef.current || detectionInterval.current) return;
+
+    detectionInterval.current = setInterval(async () => {
+        if (videoRef.current && videoRef.current.readyState >= 2) { // 2 is HAVE_CURRENT_DATA
+            try {
+                const barcodes = await barcodeDetector.detect(videoRef.current);
+                if (barcodes.length > 0) {
+                    handleBarcodeLookup(barcodes[0].rawValue);
+                }
+            } catch (e) {
+                console.error("Barcode detection failed: ", e);
+                // Could be a transient error, do not stop interval
+            }
+        }
+    }, 500);
+  }, [barcodeDetector, handleBarcodeLookup]);
+
+
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+        if (detectionInterval.current) clearInterval(detectionInterval.current);
+        return;
+    }
 
     const getCameraPermission = async (mode: FacingMode) => {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -63,13 +129,21 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
             }
 
             const stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: mode },
+                video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } },
             });
             setHasCameraPermission(true);
 
             if (videoRef.current) {
-            videoRef.current.srcObject = stream;
+                videoRef.current.srcObject = stream;
             }
+
+            // Setup barcode detector
+            if (isBarcodeSupported) {
+                // @ts-ignore - BarcodeDetector is experimental
+                const detector = new window.BarcodeDetector({ formats: ['ean_13', 'upc_a'] });
+                setBarcodeDetector(detector);
+            }
+
         } catch (error) {
             console.error('Error accessing camera:', error);
             setHasCameraPermission(false);
@@ -83,8 +157,35 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
         const stream = videoRef.current.srcObject as MediaStream;
         stream.getTracks().forEach((track) => track.stop());
       }
+      if (detectionInterval.current) {
+        clearInterval(detectionInterval.current);
+        detectionInterval.current = null;
+      }
     };
-  }, [isOpen, toast, facingMode]);
+  }, [isOpen, toast, facingMode, isBarcodeSupported]);
+
+
+  useEffect(() => {
+    if (analysisMode === 'barcode' && barcodeDetector) {
+        startBarcodeDetection();
+    } else {
+        if (detectionInterval.current) {
+            clearInterval(detectionInterval.current);
+            detectionInterval.current = null;
+        }
+    }
+    return () => {
+        if (detectionInterval.current) {
+            clearInterval(detectionInterval.current);
+            detectionInterval.current = null;
+        }
+    };
+  }, [analysisMode, barcodeDetector, startBarcodeDetection]);
+
+  const toggleAnalysisMode = () => {
+    setAnalysisMode(prev => prev === 'photo' ? 'barcode' : 'photo');
+    setCapturedImage(null);
+  }
   
   const handleSwitchCamera = () => {
     setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
@@ -137,20 +238,24 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Analyze Meal with AI</DialogTitle>
+          <DialogTitle>Analyze with AI</DialogTitle>
           <DialogDescription>
-            Take a picture of your meal to automatically identify it and estimate its calories.
+            {analysisMode === 'photo' 
+                ? "Take a picture of your meal to automatically identify it and estimate its calories."
+                : "Scan a product's barcode to look up its nutritional information."
+            }
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
             <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
-              {capturedImage ? (
+              {capturedImage && analysisMode === 'photo' ? (
                 <img
                   src={capturedImage}
                   alt="Captured meal"
                   className="h-full w-full object-cover"
                 />
               ) : (
+                <>
                 <video
                   ref={videoRef}
                   className="h-full w-full object-cover"
@@ -158,11 +263,23 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
                   muted
                   playsInline
                 />
+                {analysisMode === 'barcode' && (
+                  <div className='absolute inset-0 flex items-center justify-center pointer-events-none'>
+                      <div className='w-3/4 h-1/2 border-4 border-dashed border-primary rounded-lg animate-pulse' />
+                  </div>
+                )}
+                </>
               )}
               {hasCameraPermission === false && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 p-4 text-center text-white">
                   <Camera className="h-12 w-12" />
                   <p className="mt-2">Camera access is required.</p>
+                </div>
+              )}
+               {isLoading && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 p-4 text-center text-white">
+                  <Loader2 className="h-12 w-12 animate-spin" />
+                  <p className="mt-2">{analysisMode === 'barcode' ? "Looking up barcode..." : "Analyzing..."}</p>
                 </div>
               )}
             </div>
@@ -178,31 +295,41 @@ export default function AnalyzeFoodDialog({ isOpen, onOpenChange, onAnalysisComp
               </Alert>
             )}
 
-            <div className="flex justify-center gap-4">
-              {capturedImage ? (
-                <>
-                  <Button variant="outline" onClick={handleRetake}>
-                    Retake
-                  </Button>
-                  <Button onClick={handleAnalyze} disabled={isLoading}>
-                    {isLoading ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="mr-2 h-4 w-4" />
-                    )}
-                    Analyze
-                  </Button>
-                </>
-              ) : (
-                <>
-                <Button onClick={handleCapture} disabled={!hasCameraPermission}>
-                  <Camera className="mr-2 h-4 w-4" /> Capture
-                </Button>
-                 <Button onClick={handleSwitchCamera} disabled={!hasCameraPermission} variant="outline">
-                  <SwitchCamera className="mr-2 h-4 w-4" /> Switch
-                </Button>
-                </>
-              )}
+            <div className="flex justify-between items-center gap-4">
+              <div>
+                {isBarcodeSupported && (
+                    <Button onClick={toggleAnalysisMode} disabled={isLoading || !hasCameraPermission} variant="outline">
+                        {analysisMode === 'photo' ? <ScanBarcode className="mr-2 h-4 w-4" /> : <Camera className="mr-2 h-4 w-4" />}
+                        {analysisMode === 'photo' ? 'Scan Barcode' : 'Take Photo'}
+                    </Button>
+                )}
+              </div>
+              <div className='flex justify-center gap-4'>
+                {analysisMode === 'photo' && capturedImage ? (
+                    <>
+                    <Button variant="outline" onClick={handleRetake}>
+                        Retake
+                    </Button>
+                    <Button onClick={handleAnalyze} disabled={isLoading}>
+                        {isLoading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                        <Send className="mr-2 h-4 w-4" />
+                        )}
+                        Analyze
+                    </Button>
+                    </>
+                ) : analysisMode === 'photo' ? (
+                    <>
+                    <Button onClick={handleCapture} disabled={!hasCameraPermission || isLoading}>
+                    <Camera className="mr-2 h-4 w-4" /> Capture
+                    </Button>
+                    <Button onClick={handleSwitchCamera} disabled={!hasCameraPermission || isLoading} variant="outline">
+                    <SwitchCamera className="mr-2 h-4 w-4" /> Switch
+                    </Button>
+                    </>
+                ) : null }
+              </div>
             </div>
         </div>
       </DialogContent>
