@@ -13,10 +13,10 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const NutrientAdviceInputSchema = z.object({
-  height: z.number().describe('The user\'s height in centimeters.'),
-  weight: z.number().describe('The user\'s weight in kilograms.'),
-  age: z.number().describe('The user\'s age in years.'),
-  goal: z.string().describe('The user\'s primary health or fitness goal.'),
+  height: z.number().describe("The user's height in centimeters."),
+  weight: z.number().describe("The user's weight in kilograms."),
+  age: z.number().describe("The user's age in years."),
+  goal: z.string().describe("The user's primary health or fitness goal."),
 });
 export type NutrientAdviceInput = z.infer<typeof NutrientAdviceInputSchema>;
 
@@ -44,17 +44,21 @@ export async function getNutrientAdvice(input: NutrientAdviceInput): Promise<Nut
 const calculateBmi = (heightCm: number, weightKg: number) => {
     if (heightCm <= 0 || weightKg <= 0) return 0;
     const heightM = heightCm / 100;
-    return weightKg / (heightM * heightM);
+    return parseFloat((weightKg / (heightM * heightM)).toFixed(1));
 };
+
+const EnrichedNutrientAdviceInputSchema = NutrientAdviceInputSchema.extend({
+    bmi: z.number(),
+});
 
 const prompt = ai.definePrompt({
   name: 'nutrientAdvicePrompt',
-  input: { schema: NutrientAdviceInputSchema },
+  input: { schema: EnrichedNutrientAdviceInputSchema },
   output: { schema: NutrientAdviceOutputSchema },
   prompt: `You are an expert nutritionist. A user has provided their health data and goal.
 Your task is to:
-1. Calculate their BMI using the provided height and weight.
-2. Determine their BMI category (Underweight, Normal weight, Overweight, Obesity).
+1. Use the provided BMI. The BMI has been pre-calculated.
+2. Determine their BMI category (Underweight, Normal weight, Overweight, Obesity) based on the provided BMI.
 3. Calculate their healthy weight range based on a BMI of 18.5 to 24.9. Format it as "min kg - max kg".
 4. Provide personalized macronutrient recommendations (protein, carbs, fat) as a range in grams based on their goal.
 5. Provide 3-4 key micronutrient recommendations (e.g., Iron, Vitamin D, Calcium, B12) with a brief explanation of why it's important for their goal.
@@ -64,15 +68,10 @@ User Data:
 - Height: {{{height}}} cm
 - Weight: {{{weight}}} kg
 - Goal: {{{goal}}}
+- BMI: {{{bmi}}}
 
-BMI: {{calculateBmi height weight}}
-
-Please provide the output in the specified JSON format.
+Please provide the output in the specified JSON format, ensuring the 'bmi' in the output matches the pre-calculated BMI provided above.
 `,
-}, {
-    helpers: {
-        calculateBmi: (height: number, weight: number) => calculateBmi(height, weight).toFixed(1),
-    }
 });
 
 const nutrientAdviceFlow = ai.defineFlow(
@@ -82,7 +81,11 @@ const nutrientAdviceFlow = ai.defineFlow(
     outputSchema: NutrientAdviceOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
+    // Calculate BMI before calling the prompt
+    const bmi = calculateBmi(input.height, input.weight);
+    
+    // Pass the calculated BMI along with the original input to the prompt
+    const { output } = await prompt({ ...input, bmi });
     return output!;
   }
 );
