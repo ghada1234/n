@@ -18,6 +18,12 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 
 const initialState = {
   message: '',
@@ -139,21 +145,44 @@ const SuggestionForm = () => {
             {state.data?.planTitle || 'Your Meal Suggestions'}
             </CardTitle>
           <CardDescription>
-            Here are some ideas to get you started.
+            Here are some ideas to get you started. Click on a meal to see the recipe.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex-1 flex flex-col p-4">
             {state.data && state.data.mealSuggestions && state.data.mealSuggestions.length > 0 ? (
                  <div className="w-full space-y-4 overflow-y-auto">
-                    {state.data.mealSuggestions.map((meal, index) => (
-                        <div key={index} className="rounded-lg border p-4">
-                            <h4 className="font-bold">
-                                {meal.day && <span className="text-primary mr-2">{meal.day}:</span>}
-                                {meal.mealName} (~{meal.calories} kcal)
-                            </h4>
-                            <p className="text-sm text-muted-foreground">{meal.description}</p>
-                        </div>
-                    ))}
+                    <Accordion type="single" collapsible className="w-full">
+                        {state.data.mealSuggestions.map((meal, index) => (
+                            <AccordionItem value={`item-${index}`} key={index}>
+                                <AccordionTrigger>
+                                    <div className="flex flex-col items-start text-left">
+                                         <h4 className="font-bold">
+                                            {meal.day && <span className="text-primary mr-2">{meal.day}:</span>}
+                                            {meal.mealName}
+                                        </h4>
+                                        <p className='text-sm text-muted-foreground'>(~{meal.calories} kcal)</p>
+                                    </div>
+                                </AccordionTrigger>
+                                <AccordionContent>
+                                    <div className="space-y-4 px-1">
+                                        <p className="text-sm text-muted-foreground">{meal.description}</p>
+                                        <div>
+                                            <h5 className="font-semibold mb-2">Ingredients</h5>
+                                            <ul className="list-disc list-inside text-sm space-y-1">
+                                                {meal.ingredients.map((ingredient, i) => (
+                                                    <li key={i}>{ingredient}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h5 className="font-semibold mb-2">Instructions</h5>
+                                            <p className="whitespace-pre-wrap text-sm">{meal.instructions}</p>
+                                        </div>
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                        ))}
+                    </Accordion>
                  </div>
             ) : (
                 <div className="flex-1 flex flex-col items-center justify-center text-center text-muted-foreground p-8">
