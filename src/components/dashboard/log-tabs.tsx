@@ -60,6 +60,8 @@ const LogTabs = () => {
     const [exerciseLog, setExerciseLog] = useState<ExerciseLogEntry[]>(initialExerciseLog);
     const [isAddFoodOpen, setAddFoodOpen] = useState(false);
     const [isAddExerciseOpen, setAddExerciseOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('food');
+    const [searchTerm, setSearchTerm] = useState('');
 
     const handleAddFood = (newFood: Omit<FoodLogEntry, 'id'>) => {
         setFoodLog(prevLog => [...prevLog, { ...newFood, id: prevLog.length + 1 }]);
@@ -69,9 +71,17 @@ const LogTabs = () => {
         setExerciseLog(prevLog => [...prevLog, { ...newExercise, id: prevLog.length + 1 }]);
     }
 
+    const filteredFoodLog = foodLog.filter(entry =>
+        entry.item.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const filteredExerciseLog = exerciseLog.filter(entry =>
+        entry.details.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
   return (
     <>
-    <Tabs defaultValue="food">
+    <Tabs value={activeTab} onValueChange={setActiveTab}>
       <div className="flex items-center justify-between">
         <TabsList>
           <TabsTrigger value="food">Food Log</TabsTrigger>
@@ -83,6 +93,8 @@ const LogTabs = () => {
             type="search"
             placeholder="Search..."
             className="w-full rounded-lg bg-card pl-8 md:w-[200px] lg:w-[320px]"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
       </div>
@@ -104,7 +116,7 @@ const LogTabs = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {foodLog.map((entry) => (
+                {filteredFoodLog.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell className="font-medium">{entry.meal}</TableCell>
                     <TableCell>{entry.item}</TableCell>
@@ -137,7 +149,7 @@ const LogTabs = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {exerciseLog.map((entry) => (
+                {filteredExerciseLog.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell className="font-medium">{entry.type}</TableCell>
                     <TableCell>{entry.details}</TableCell>
