@@ -10,11 +10,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Camera, Loader2, Send } from 'lucide-react';
+import { Camera, Loader2, Send, SwitchCamera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { analyzeMealAction } from './actions';
 import type { MealAnalyzerOutput } from '@/ai/flows/meal-analyzer';
+
+type FacingMode = 'user' | 'environment';
 
 export default function MealAnalyzerPage() {
   const { toast } = useToast();
@@ -26,9 +28,10 @@ export default function MealAnalyzerPage() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<MealAnalyzerOutput | null>(null);
+  const [facingMode, setFacingMode] = useState<FacingMode>('environment');
 
   useEffect(() => {
-    const getCameraPermission = async () => {
+    const getCameraPermission = async (mode: FacingMode) => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         setHasCameraPermission(false);
         toast({
@@ -40,8 +43,14 @@ export default function MealAnalyzerPage() {
         return;
       }
       try {
+        // Stop any existing stream
+        if (videoRef.current && videoRef.current.srcObject) {
+            const stream = videoRef.current.srcObject as MediaStream;
+            stream.getTracks().forEach((track) => track.stop());
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: { facingMode: mode },
         });
         setHasCameraPermission(true);
 
@@ -60,7 +69,7 @@ export default function MealAnalyzerPage() {
       }
     };
 
-    getCameraPermission();
+    getCameraPermission(facingMode);
 
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -68,7 +77,13 @@ export default function MealAnalyzerPage() {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [toast]);
+  }, [toast, facingMode]);
+  
+  const handleSwitchCamera = () => {
+    setFacingMode(prev => prev === 'user' ? 'environment' : 'user');
+    setCapturedImage(null);
+    setAnalysis(null);
+  }
 
   const handleCapture = () => {
     if (videoRef.current && canvasRef.current) {
@@ -182,9 +197,14 @@ export default function MealAnalyzerPage() {
                   </Button>
                 </>
               ) : (
+                <>
                 <Button onClick={handleCapture} disabled={!hasCameraPermission}>
                   <Camera className="mr-2 h-4 w-4" /> Capture Photo
                 </Button>
+                 <Button onClick={handleSwitchCamera} disabled={!hasCameraPermission} variant="outline">
+                  <SwitchCamera className="mr-2 h-4 w-4" /> Switch Camera
+                </Button>
+                </>
               )}
             </div>
           </CardContent>
