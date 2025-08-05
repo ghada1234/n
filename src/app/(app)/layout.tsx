@@ -54,7 +54,7 @@ export default function AppLayout({
   }, [searchParams]);
 
   const handleLogout = () => {
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   return (

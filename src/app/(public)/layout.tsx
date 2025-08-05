@@ -110,10 +110,10 @@ export default function PublicLayout({
               <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href="/login">{t('login')}</Link>
+                <Link href="/auth/login">{t('login')}</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/signup">{t('signUp')}</Link>
+                <Link href="/auth/signup">{t('signUp')}</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
