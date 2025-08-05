@@ -31,7 +31,11 @@ import {
 } from '../ui/dropdown-menu';
 import { useLanguage } from '@/hooks/use-language';
 
-const AppSidebar = () => {
+interface AppSidebarProps {
+    isMobile?: boolean;
+}
+
+const AppSidebar = ({ isMobile = false}: AppSidebarProps) => {
   const pathname = usePathname();
   const router = useRouter();
   const { t, setLanguage } = useLanguage();
@@ -47,8 +51,8 @@ const AppSidebar = () => {
     router.push('/login');
   };
 
-  return (
-    <Sidebar className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:fixed lg:inset-y-0">
+  const SidebarBody = () => (
+    <>
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <Utensils className="w-8 h-8 text-primary" />
@@ -101,6 +105,16 @@ const AppSidebar = () => {
             <span>{t('logout')}</span>
         </Button>
       </SidebarFooter>
+    </>
+  );
+
+  if (isMobile) {
+    return <SidebarBody />;
+  }
+
+  return (
+    <Sidebar className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:fixed lg:inset-y-0">
+      <SidebarBody />
     </Sidebar>
   );
 };

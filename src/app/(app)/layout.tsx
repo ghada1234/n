@@ -2,7 +2,7 @@
 'use client';
 
 import AppSidebar from '@/components/layout/app-sidebar';
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useLanguage } from '@/hooks/use-language';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -17,6 +17,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogOut } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu } from 'lucide-react';
 
 export default function AppLayout({
   children,
@@ -55,8 +57,19 @@ export default function AppLayout({
     <SidebarProvider>
       <div className="flex min-h-screen w-full flex-col">
         <AppSidebar />
-        <div className="flex flex-col sm:gap-4 sm:py-4 sm:pl-14">
+        <div className="flex flex-col sm:gap-4 sm:py-4 lg:pl-64">
            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+             <Sheet>
+                <SheetTrigger asChild>
+                  <Button size="icon" variant="outline" className="lg:hidden">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle Menu</span>
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side={language === 'ar' ? 'right' : 'left'} className="sm:max-w-xs">
+                   <AppSidebar isMobile={true}/>
+                </SheetContent>
+              </Sheet>
             <div className="relative ml-auto flex-1 md:grow-0">
                <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -84,7 +97,7 @@ export default function AppLayout({
               </DropdownMenu>
             </div>
           </header>
-          <main className="flex-1 lg:pl-64">
+          <main className="flex-1">
             <div className="p-4 lg:p-8 pt-0">{children}</div>
           </main>
         </div>
