@@ -36,17 +36,7 @@ export default function AboutPage() {
           </div>
 
           <Card className="overflow-hidden">
-            <div className="grid md:grid-cols-3 items-center">
-                <div className="md:col-span-1">
-                    <Image 
-                        src="https://placehold.co/400x400.png"
-                        alt={t('founderName')}
-                        width={400}
-                        height={400}
-                        className="object-cover w-full h-full"
-                        data-ai-hint="portrait professional"
-                    />
-                </div>
+            <div className="grid items-center">
                 <div className="md:col-span-2">
                     <CardHeader>
                         <CardTitle className="text-2xl">{t('founderName')}</CardTitle>
