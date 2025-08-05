@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { generateMealSuggestion } from '@/app/ai-suggestions/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Sparkles, Loader2, Download } from 'lucide-react';
-import { useEffect, useRef, useActionState as useReactActionState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
 import {
@@ -70,7 +70,7 @@ const WhatsAppIcon = () => (
 
 const SuggestionForm = () => {
   const { t } = useLanguage();
-  const [state, formAction] = useReactActionState(generateMealSuggestion, initialState);
+  const [state, formAction] = useActionState(generateMealSuggestion, initialState);
   const { toast } = useToast();
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const { pending } = useFormStatus();

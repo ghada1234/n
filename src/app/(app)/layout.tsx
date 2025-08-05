@@ -29,12 +29,11 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userName, setUserName] = useState('Alex');
   const [userInitial, setUserInitial] = useState('A');
-  const { t } = useLanguage();
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
 
   useEffect(() => {
@@ -62,8 +61,8 @@ export default function AppLayout({
     <SidebarProvider>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
         <AppSidebar onLinkClick={() => setIsMobileSheetOpen(false)} />
-        <div className="flex flex-col lg:pl-64">
-           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:px-6">
+        <div className="flex flex-col sm:gap-4 sm:py-4 lg:pl-64">
+           <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
              <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
                 <SheetTrigger asChild>
                   <Button size="icon" variant="outline" className="lg:hidden">
@@ -115,8 +114,8 @@ export default function AppLayout({
               </DropdownMenu>
             </div>
           </header>
-          <main className="flex-1">
-            <div className="p-4">{children}</div>
+          <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+            {children}
           </main>
         </div>
       </div>

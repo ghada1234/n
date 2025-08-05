@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import { generateNutrientAdviceAction } from '@/app/profile/actions';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/use-language';
-import { Save, Sparkles, Loader2, Weight, Scale, Target } from 'lucide-react';
-import { useEffect, useRef, useActionState as useReactActionState } from 'react';
+import { Save, Sparkles, Loader2 } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
 const initialState = {
@@ -37,7 +37,7 @@ function SubmitButton() {
 
 const ProfileForm = () => {
   const { t, language } = useLanguage();
-  const [state, formAction] = useReactActionState(generateNutrientAdviceAction, initialState);
+  const [state, formAction] = useActionState(generateNutrientAdviceAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -47,6 +47,15 @@ const ProfileForm = () => {
             variant: "destructive",
             title: t('errorOccurred'),
             description: state.message,
+        })
+    }
+    if (state.errors) {
+        // You can add more specific error handling here if needed
+        const errorMessages = Object.values(state.errors).flat().join(', ');
+        toast({
+            variant: 'destructive',
+            title: t('formInvalid'),
+            description: errorMessages
         })
     }
   }, [state, toast, t]);

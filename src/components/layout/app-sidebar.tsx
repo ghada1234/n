@@ -43,7 +43,7 @@ const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
 
   const handleLogout = () => {
     if (onLinkClick) onLinkClick();
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   const createHref = (path: string) => {
@@ -53,8 +53,8 @@ const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
 
   const SidebarBody = () => (
     <div className="flex flex-col h-full">
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
+      <SidebarHeader>
+        <div className="flex items-center gap-2 p-4">
           <Utensils className="w-8 h-8 text-primary" />
           <h2 className="text-2xl font-headline font-bold text-foreground">
             {t('appName')}
@@ -80,12 +80,16 @@ const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="p-4">
-        {isMobile && (
+      <SidebarFooter className="p-4 mt-auto">
+        {isMobile ? (
              <Button variant="ghost" className="justify-start gap-2" onClick={handleLogout}>
                 <LogOut className="w-5 h-5" />
                 <span>{t('logout')}</span>
             </Button>
+        ) : (
+          <p className="text-xs text-muted-foreground text-center">
+            {t('copyright')}
+          </p>
         )}
       </SidebarFooter>
     </div>
