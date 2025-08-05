@@ -35,6 +35,7 @@ export default function AppLayout({
   const [userName, setUserName] = useState('Alex');
   const [userInitial, setUserInitial] = useState('A');
   const { t } = useLanguage();
+  const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -60,18 +61,18 @@ export default function AppLayout({
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full flex-col">
-        <AppSidebar />
+        <AppSidebar onLinkClick={() => setIsMobileSheetOpen(false)} />
         <div className="flex flex-col sm:gap-4 sm:py-4 lg:pl-64">
            <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
-             <Sheet>
+             <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
                 <SheetTrigger asChild>
                   <Button size="icon" variant="outline" className="lg:hidden">
                     <Menu className="h-5 w-5" />
                     <span className="sr-only">Toggle Menu</span>
                   </Button>
                 </SheetTrigger>
-                <SheetContent side={language === 'ar' ? 'right' : 'left'} className="sm:max-w-xs">
-                   <AppSidebar isMobile={true}/>
+                <SheetContent side={language === 'ar' ? 'right' : 'left'} className="sm:max-w-xs p-0">
+                   <AppSidebar isMobile={true} onLinkClick={() => setIsMobileSheetOpen(false)}/>
                 </SheetContent>
               </Sheet>
             <div className="relative ml-auto flex-1 md:grow-0">

@@ -21,7 +21,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -33,10 +33,12 @@ import { useLanguage } from '@/hooks/use-language';
 
 interface AppSidebarProps {
     isMobile?: boolean;
+    onLinkClick?: () => void;
 }
 
-const AppSidebar = ({ isMobile = false}: AppSidebarProps) => {
+const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { t, setLanguage } = useLanguage();
 
@@ -48,11 +50,17 @@ const AppSidebar = ({ isMobile = false}: AppSidebarProps) => {
   ];
 
   const handleLogout = () => {
+    if (onLinkClick) onLinkClick();
     router.push('/login');
   };
 
+  const createHref = (path: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    return `${path}?${params.toString()}`;
+  }
+
   const SidebarBody = () => (
-    <>
+    <div className="flex flex-col h-full">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-2">
           <Utensils className="w-8 h-8 text-primary" />
@@ -69,8 +77,9 @@ const AppSidebar = ({ isMobile = false}: AppSidebarProps) => {
                 asChild
                 isActive={pathname === item.href}
                 className="justify-start"
+                onClick={onLinkClick}
               >
-                <Link href={item.href}>
+                <Link href={createHref(item.href)}>
                   <item.icon className="w-5 h-5" />
                   <span>{item.label}</span>
                 </Link>
@@ -80,32 +89,12 @@ const AppSidebar = ({ isMobile = false}: AppSidebarProps) => {
         </SidebarMenu>
       </SidebarContent>
       <SidebarFooter className="p-4 flex flex-col gap-2">
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="justify-start gap-2">
-                    <Languages className="w-5 h-5" />
-                    <span>{t('language')}</span>
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="right" align="start">
-                <DropdownMenuItem onClick={() => setLanguage('en')}>
-                    {t('english')}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('ar')}>
-                    {t('arabic')}
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-        <Button variant="ghost" className="justify-start gap-2">
-          <Settings className="w-5 h-5" />
-          <span>{t('settings')}</span>
-        </Button>
         <Button variant="ghost" className="justify-start gap-2" onClick={handleLogout}>
             <LogOut className="w-5 h-5" />
             <span>{t('logout')}</span>
         </Button>
       </SidebarFooter>
-    </>
+    </div>
   );
 
   if (isMobile) {
