@@ -2,7 +2,7 @@
 'use client';
 
 import AppSidebar from '@/components/layout/app-sidebar';
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { useLanguage } from '@/hooks/use-language';
 import { useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -15,8 +15,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
-import { LogOut } from 'lucide-react';
+import { LogOut, Languages } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
 
@@ -25,7 +29,7 @@ export default function AppLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { language } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [userName, setUserName] = useState('Alex');
@@ -88,6 +92,19 @@ export default function AppLayout({
                       </p>
                     </div>
                   </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                        <Languages className="mr-2 h-4 w-4" />
+                        <span>{t('language')}</span>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                            <DropdownMenuItem onClick={() => setLanguage('en')}>{t('english')}</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => setLanguage('ar')}>{t('arabic')}</DropdownMenuItem>
+                        </DropdownMenuSubContent>
+                    </DropdownMenuPortal>
+                  </DropdownMenuSub>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
