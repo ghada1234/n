@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Utensils, Languages, UserCircle } from 'lucide-react';
@@ -39,17 +40,14 @@ export default function PublicLayout({
   const { language, setLanguage, t } = useLanguage();
   const pathname = usePathname();
 
-  // Hide layout on auth pages
-  if (pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/reset-password')) {
-    return <>{children}</>;
-  }
+  // This layout is for public pages, auth pages have their own layout
   
   return (
     <div className="flex min-h-screen w-full flex-col">
        <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-50">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
-            href="#"
+            href="/home"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
             <Utensils className="h-6 w-6 text-primary" />
@@ -73,7 +71,7 @@ export default function PublicLayout({
           <SheetContent side={language === 'ar' ? 'right' : 'left'}>
             <nav className="grid gap-6 text-lg font-medium">
               <Link
-                href="#"
+                href="/home"
                 className="flex items-center gap-2 text-lg font-semibold"
               >
                 <Utensils className="h-6 w-6 text-primary" />
