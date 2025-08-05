@@ -16,16 +16,18 @@ import { UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/hooks/use-language';
+import { useState } from 'react';
 
 export default function SignupPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const [name, setName] = useState('');
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you'd handle user creation here.
     // For this prototype, we'll just navigate to the dashboard.
-    router.push('/dashboard');
+    router.push(`/dashboard?name=${encodeURIComponent(name)}`);
   };
   return (
     <Card>
@@ -39,7 +41,15 @@ export default function SignupPage() {
         <CardContent className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">{t('fullNameLabel')}</Label>
-            <Input id="name" type="text" placeholder={t('fullNamePlaceholder')} required />
+            <Input 
+              id="name" 
+              name="name"
+              type="text" 
+              placeholder={t('fullNamePlaceholder')} 
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">{t('emailLabel')}</Label>

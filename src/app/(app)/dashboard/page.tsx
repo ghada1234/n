@@ -4,11 +4,23 @@
 import PageHeader from '@/components/page-header';
 import LogTabs from '@/components/dashboard/log-tabs';
 import { useLanguage } from '@/hooks/use-language';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const { t } = useLanguage();
-  // In a real app, you would get the user's name from your authentication state
-  const userName = 'Alex'; // Placeholder for demonstration
+  const searchParams = useSearchParams();
+  const [userName, setUserName] = useState('Alex'); // Default name
+
+  useEffect(() => {
+    const name = searchParams.get('name');
+    const email = searchParams.get('email');
+    if (name) {
+      setUserName(name);
+    } else if (email) {
+      setUserName(email);
+    }
+  }, [searchParams]);
 
   return (
     <div className="space-y-8">

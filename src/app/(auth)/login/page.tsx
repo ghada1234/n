@@ -16,16 +16,18 @@ import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/hooks/use-language';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
   const { t } = useLanguage();
+  const [email, setEmail] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, you'd handle authentication here.
     // For this prototype, we'll just navigate to the dashboard.
-    router.push('/dashboard');
+    router.push(`/dashboard?email=${encodeURIComponent(email)}`);
   };
 
   return (
@@ -45,6 +47,8 @@ export default function LoginPage() {
               type="email"
               placeholder={t('emailPlaceholder')}
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           <div className="space-y-2">
