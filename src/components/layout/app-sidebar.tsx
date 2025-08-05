@@ -18,9 +18,10 @@ import {
   Utensils,
   Settings,
   Languages,
+  LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -32,6 +33,7 @@ import { useLanguage } from '@/hooks/use-language';
 
 const AppSidebar = () => {
   const pathname = usePathname();
+  const router = useRouter();
   const { t, setLanguage } = useLanguage();
 
   const menuItems = [
@@ -40,6 +42,10 @@ const AppSidebar = () => {
     { href: '/ai-suggestions', label: t('aiSuggestions'), icon: Sparkles },
     { href: '/profile', label: t('profile'), icon: User },
   ];
+
+  const handleLogout = () => {
+    router.push('/login');
+  };
 
   return (
     <Sidebar className="hidden lg:flex lg:flex-col lg:w-64 lg:border-r lg:fixed lg:inset-y-0">
@@ -89,6 +95,10 @@ const AppSidebar = () => {
         <Button variant="ghost" className="justify-start gap-2">
           <Settings className="w-5 h-5" />
           <span>{t('settings')}</span>
+        </Button>
+        <Button variant="ghost" className="justify-start gap-2" onClick={handleLogout}>
+            <LogOut className="w-5 h-5" />
+            <span>{t('logout')}</span>
         </Button>
       </SidebarFooter>
     </Sidebar>

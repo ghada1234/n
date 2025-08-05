@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Utensils, Languages } from 'lucide-react';
+import { Utensils, Languages, UserCircle } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -11,6 +11,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel
 } from '@/components/ui/dropdown-menu';
 import { useLanguage } from '@/hooks/use-language';
 import { usePathname } from 'next/navigation';
@@ -98,9 +100,26 @@ export default function PublicLayout({
                 </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button asChild>
-            <Link href="/login">{t('login')}</Link>
-          </Button>
+          
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="secondary" size="icon" className="rounded-full">
+                <UserCircle className="h-5 w-5" />
+                <span className="sr-only">{t('toggleUserMenu')}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href="/login">{t('login')}</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/signup">{t('signUp')}</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
       </header>
       <main className="flex-1">{children}</main>
