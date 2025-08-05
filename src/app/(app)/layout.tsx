@@ -32,8 +32,8 @@ export default function AppLayout({
   const { language, setLanguage, t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [userName, setUserName] = useState('Alex');
-  const [userInitial, setUserInitial] = useState('A');
+  const [userName, setUserName] = useState('Ghada');
+  const [userInitial, setUserInitial] = useState('G');
   const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
 
   useEffect(() => {

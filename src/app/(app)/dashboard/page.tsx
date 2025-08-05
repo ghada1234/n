@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 export default function DashboardPage() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
-  const [userName, setUserName] = useState('Alex'); // Default name
+  const [userName, setUserName] = useState('Ghada'); // Default name
 
   useEffect(() => {
     const name = searchParams.get('name');

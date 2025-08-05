@@ -68,11 +68,11 @@ const ProfileForm = () => {
       <input type="hidden" name="language" value={language} />
       <div className="flex items-center gap-8">
         <Avatar className="h-24 w-24">
-          <AvatarFallback>AD</AvatarFallback>
+          <AvatarFallback>GA</AvatarFallback>
         </Avatar>
         <div className="space-y-2">
-          <h3 className="text-2xl font-headline">Alex Doe</h3>
-          <p className="text-muted-foreground">alex.doe@example.com</p>
+          <h3 className="text-2xl font-headline">Ghada Al-Ani</h3>
+          <p className="text-muted-foreground">ghada.al-ani@example.com</p>
           <Button variant="outline" size="sm">
             {t('changePhoto')}
           </Button>
@@ -82,11 +82,11 @@ const ProfileForm = () => {
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="name">{t('fullNameLabel')}</Label>
-          <Input id="name" name="name" defaultValue="Alex Doe" />
+          <Input id="name" name="name" defaultValue="Ghada Al-Ani" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">{t('emailLabel')}</Label>
-          <Input id="email" name="email" type="email" defaultValue="alex.doe@example.com" />
+          <Input id="email" name="email" type="email" defaultValue="ghada.al-ani@example.com" />
         </div>
         <div className="space-y-2">
           <Label htmlFor="age">{t('age')}</Label>
