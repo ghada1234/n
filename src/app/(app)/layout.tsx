@@ -20,10 +20,12 @@ export default function AppLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar />
-      <main className="flex-1 lg:pl-[256px]">
-        <div className="p-4 lg:p-8">{children}</div>
-      </main>
+      <div className="flex">
+        <AppSidebar />
+        <main className="flex-1 lg:pl-64">
+          <div className="p-4 lg:p-8">{children}</div>
+        </main>
+      </div>
     </SidebarProvider>
   );
 }
