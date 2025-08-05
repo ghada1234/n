@@ -39,11 +39,11 @@ export const en = {
     aboutTitle: 'About Nutrition Navigator',
     aboutDescription1: 'We believe that navigating the world of nutrition should be simple, personal, and empowering. Our mission is to provide you with the tools and insights you need to build healthy habits, understand your body, and achieve your wellness goals with confidence.',
     aboutDescription2: 'Nutrition Navigator started with a simple idea: what if we could use technology to take the guesswork out of healthy eating? From that spark, we built an intelligent platform that combines user-friendly design with powerful AI to create a truly personalized nutrition companion. Whether you\'re looking to lose weight, build muscle, or simply feel your best, we\'re here to guide you every step of the way.',
-    meetTheTeam: 'Meet the Team',
-    teamDescription: 'We are a passionate team of developers, designers, and nutrition enthusiasts.',
-    founderName: 'Ghada Alani',
-    founderTitle: 'Founder & Lead Nutritionist',
-    founderDescription: 'Ghada is a certified nutritionist with over a decade of experience helping people transform their lives through food. She is the visionary behind Nutrition Navigator, driven by a passion to make expert nutritional guidance accessible to everyone.',
+    meetTheTeam: 'Meet the Creator',
+    teamDescription: 'The passionate software engineer behind the project.',
+    founderName: 'Alex Doe',
+    founderTitle: 'Founder & Lead Developer',
+    founderDescription: 'Alex is a software engineer with a passion for health and technology. Frustrated with the complicated and often tedious process of tracking nutrition, Alex set out to build a smarter, more intuitive solution. Nutrition Navigator is the result of that vision, combining a love for clean code and a desire to make healthy living accessible to everyone.',
 
     // Auth Pages (Login, Signup, Reset)
     welcomeBack: 'Welcome Back!',
