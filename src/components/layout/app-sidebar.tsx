@@ -16,19 +16,11 @@ import {
   Sparkles,
   User,
   Utensils,
-  Settings,
-  Languages,
   LogOut,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '../ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
 import { useLanguage } from '@/hooks/use-language';
 
 interface AppSidebarProps {
@@ -40,7 +32,7 @@ const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { t, setLanguage } = useLanguage();
+  const { t } = useLanguage();
 
   const menuItems = [
     { href: '/dashboard', label: t('dashboard'), icon: LayoutGrid },
@@ -88,11 +80,13 @@ const AppSidebar = ({ isMobile = false, onLinkClick }: AppSidebarProps) => {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter className="p-4 flex flex-col gap-2">
-        <Button variant="ghost" className="justify-start gap-2" onClick={handleLogout}>
-            <LogOut className="w-5 h-5" />
-            <span>{t('logout')}</span>
-        </Button>
+      <SidebarFooter className="p-4">
+        {isMobile && (
+             <Button variant="ghost" className="justify-start gap-2" onClick={handleLogout}>
+                <LogOut className="w-5 h-5" />
+                <span>{t('logout')}</span>
+            </Button>
+        )}
       </SidebarFooter>
     </div>
   );
