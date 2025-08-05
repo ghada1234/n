@@ -1,4 +1,6 @@
 {
-  "firebase_hosting": {},
+  "firebase_hosting": {
+    "deploymentHostingUrl": "https://nutrition-navigator-4tqm7.web.app"
+  },
   "cloud_run_deploy": {}
 }
